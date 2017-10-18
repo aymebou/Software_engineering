@@ -5,13 +5,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
-	private DisplayedImage inputImage = new DisplayedImage(); 
+	private DisplayedImage inputImage = new DisplayedImage();
 	private DisplayedImage ouputImage = new DisplayedImage();
 	private JButton buttonAction = new JButton("Action");
 
@@ -19,6 +21,9 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenu fileMenu = new JMenu("File");
 
 	private JMenuItem itemClose = new JMenuItem("Close");
+	private JMenuItem itemOpen = new JMenuItem("Open");   /* Création du bouton Open */
+
+	private JFileChooser chooser = new JFileChooser();
 
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
@@ -37,7 +42,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 
 		JPanel output = new JPanel();
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
-		output.add(ouputImage); 
+		output.add(ouputImage);
 
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
@@ -54,7 +59,22 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 			}        
 		});
 		this.fileMenu.add(itemClose);  
+		
+		//Tentative d'implementation du bouton Open
+		this.fileMenu.addSeparator();
+		itemOpen.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				int returnVal = chooser.showOpenDialog(null);
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					inputImage = new DisplayedImage(chooser.getSelectedFile());
+                    //Reste à afficher l'image
+				}
+			}
+		});
+		this.fileMenu.add(itemOpen);
+		//fin de tentative
 
+		this.fileMenu.add(itemClose); 
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 
