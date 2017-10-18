@@ -3,6 +3,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+
+import org.jfree.ui.RefineryUtilities;
+
 import javax.swing.JButton;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -18,6 +21,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private DisplayedImage ouputImage = new DisplayedImage();
 	private JButton buttonAction = new JButton("Action");
 	private JButton buttonInversion = new JButton("Inversion"); 	//Crée un nouveau bouton "Inversion"
+	private JButton buttonHisto = new JButton("Histogramme");		//Crée un nouveau bouton "Histogramme"
 
 	private JMenuBar menuBar = new JMenuBar();
 	private JMenu fileMenu = new JMenu("File");
@@ -42,6 +46,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		buttonAction.addActionListener(new ButtonListener());
 		action.add(buttonInversion);
 		buttonInversion.addActionListener(new Inversion());
+		action.add(buttonHisto);
+		buttonHisto.addActionListener(new Histogramme());
 
 		JPanel output = new JPanel();
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
@@ -126,4 +132,16 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 			ouputImage.repaint();			//Refresh l'image
 		}
 	}
+	
+	class Histogramme implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			int[] pixels = inputImage.getColor();
+			BarChartInt chart = new BarChartInt("Tré bo barChart", 
+			         "Répartition des couleurs", pixels);
+			chart.pack( );        
+			RefineryUtilities.centerFrameOnScreen( chart );        
+			chart.setVisible( true ); 
+		}
+	}
+
 }
