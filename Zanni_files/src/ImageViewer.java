@@ -4,20 +4,26 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
 	private DisplayedImage inputImage = new DisplayedImage(); 
 	private DisplayedImage ouputImage = new DisplayedImage();
 	private JButton buttonAction = new JButton("Action");
+	private JButton buttonInversion = new JButton("Inversion"); 	//Crée un nouveau bouton "Inversion"
 
 	private JMenuBar menuBar = new JMenuBar();
 	private JMenu fileMenu = new JMenu("File");
-
+	
+	private JMenuItem itemOpen = new JMenuItem("Open");			//Crée une nouvelle option "Open"
+	private JMenuItem itemSave = new JMenuItem("Save");			//Crée une nouvelle option "Save"
 	private JMenuItem itemClose = new JMenuItem("Close");
 
 	public ImageViewer () {
@@ -34,6 +40,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		action.add(buttonAction);
 		// Defines action associated to buttons
 		buttonAction.addActionListener(new ButtonListener());
+		action.add(buttonInversion);
+		buttonInversion.addActionListener(new Inversion());
 
 		JPanel output = new JPanel();
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
@@ -47,13 +55,54 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 
 		this.getContentPane().add(global);
 
+		itemOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				{
+		            // création de la boîte de dialogue
+		            JFileChooser dialogue = new JFileChooser();
+		             
+		            // affichage
+		            dialogue.showOpenDialog(null);
+		             
+		            // récupération du fichier sélectionné
+		            inputImage.setImage(dialogue.getSelectedFile());
+		            ouputImage.setImage(dialogue.getSelectedFile());
+		            input.add(inputImage);	//Ajoute l'image choisie
+		            output.add(ouputImage);
+		            input.repaint();			//Refresh l'image
+		        }
+			}//Aucune gestion de l'échec
+		});
+		this.fileMenu.add(itemOpen);
+		
+		this.fileMenu.addSeparator();
+		itemSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				{
+		            // création de la boîte de dialogue
+		            JFileChooser dialogue = new JFileChooser();
+		             
+		            // affichage
+		            dialogue.showSaveDialog(null);
+		            try {
+		            		ImageIO.write(ouputImage.getBuffer(), "png", dialogue.getSelectedFile());		//Save as TextEdit file, why ?
+		            } catch (IOException e) {
+		            		e.printStackTrace();
+		            }
+				}
+			}
+		});
+		this.fileMenu.add(itemSave);
+		
 		this.fileMenu.addSeparator();
 		itemClose.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
 			}        
 		});
-		this.fileMenu.add(itemClose);  
+		this.fileMenu.add(itemClose); 
+		
+		
 
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
@@ -68,6 +117,13 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		public void actionPerformed(ActionEvent arg0) 
 		{
 			System.out.println("Action Performed");
+		}
+	}
+	
+	class Inversion implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			ouputImage.inversion();
+			ouputImage.repaint();			//Refresh l'image
 		}
 	}
 }
