@@ -14,6 +14,7 @@ import javax.swing.JFileChooser;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
@@ -68,16 +69,18 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		            JFileChooser dialogue = new JFileChooser();
 		             
 		            // affichage
-		            dialogue.showOpenDialog(null);
+		            int returnVal = dialogue.showOpenDialog(null);
 		             
 		            // récupération du fichier sélectionné
-		            inputImage.setImage(dialogue.getSelectedFile());
-		            ouputImage.setImage(dialogue.getSelectedFile());
-		            input.add(inputImage);	//Ajoute l'image choisie
-		            output.add(ouputImage);
-		            input.repaint();			//Refresh l'image
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        inputImage.setImage(dialogue.getSelectedFile());
+                        ouputImage.setImage(dialogue.getSelectedFile());
+                        input.add(inputImage);    //Ajoute l'image choisie
+                        output.add(ouputImage);
+                        input.repaint();            //Refresh l'image
+                    }
 		        }
-			}//Aucune gestion de l'échec
+			}
 		});
 		this.fileMenu.add(itemOpen);
 		
@@ -89,12 +92,16 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		            JFileChooser dialogue = new JFileChooser();
 		             
 		            // affichage
-		            dialogue.showSaveDialog(null);
-		            try {
-		            		ImageIO.write(ouputImage.getBuffer(), "png", dialogue.getSelectedFile());		//Save as TextEdit file, why ?
-		            } catch (IOException e) {
-		            		e.printStackTrace();
-		            }
+		            int returnVal = dialogue.showSaveDialog(null);
+
+		            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            Files.createFile(dialogue.getSelectedFile().toPath());
+                            ImageIO.write(ouputImage.getBuffer(), "png", dialogue.getSelectedFile());        //Save as TextEdit file, why ?
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 				}
 			}
 		});
