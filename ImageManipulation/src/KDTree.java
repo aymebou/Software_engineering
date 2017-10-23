@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import static java.lang.Math.pow;
 
 public class KDTree {
@@ -9,6 +12,7 @@ public class KDTree {
         private int[] coord;
         private int[] hyperplan = new int[dimension + 1];    /* Contient les coefficients de l'equation d'hyperplan
                                             a*x + b*y + c*z + ... + cste = 0 */
+
         private Node(int[] coordonnees){
             coord = coordonnees;
         }
@@ -26,12 +30,14 @@ public class KDTree {
 
         /* Construit un hyperplan normal à celui du noeud pere */
         void setHyperplan(Node pere){
-            hyperplan[0] = - pere.hyperplan[1];
-            hyperplan[1] = pere.hyperplan[0];
-            for (int i = 2 ; i < dimension ; i++){
-                hyperplan[i] = 0;
+            for (int i = 0 ; i < dimension ; i++) {
+                hyperplan[i] = pere.hyperplan[(i + 1) % dimension];
             }
-            hyperplan[dimension] = - (hyperplan[0] * coord[0] + hyperplan[1] * coord[1]);
+            hyperplan[dimension] = - (hyperplan[0] * coord[0] + hyperplan[1] * coord[1] + hyperplan[2] * coord[2]);
+            /*hyperplan[dimension] = 0;
+            for (int i = 0 ; i < dimension ; i++) {
+                hyperplan[dimension] -= (pere.hyperplan[i] * coord[i]);
+            }*/
         }
 
         /* Attribue un hyperplan arbitraire, utile pour attribuer un hyperplan au premier
@@ -68,8 +74,8 @@ public class KDTree {
     }
 
 
-
-    void addNode(Node node){
+    //Ajoute un noeud à un KDTree, inutile pour le TD, utile seulement pour les tests
+    /*void addNode(Node node){
 
         if (node.estAGauche(this.tete)){
 
@@ -91,50 +97,63 @@ public class KDTree {
 
         }
 
-    }
+    }*/
 
-    //Construit une liste de noeuds à partir d'une liste de pixels (liste de triplets RGB)
-    private Node[] buildNodeList(int[][] pixels) {
-        Node[] nodes = new Node[pixels.length];
-        for (int i = 0 ; i < nodes.length ; i++) {
-            nodes[i] = new Node(pixels[i]);
+    //Construit une liste de noeuds a partir d'un tableau de pixels
+    private List<Node> buildNodeList(int[][] pixels) {
+        List<Node> nodes = new ArrayList<>();
+        for (int i = 0 ; i < pixels.length ; i++) {
+            nodes.add(new Node(pixels[i]));
         }
         return nodes;
     }
 
-    /* Construit naivement un KDTree a partir d'une liste de noeuds en les
-    ajoutant un par un */
-    private void buildFromNodesNaive(Node[] liste) {
-        /* On ajoute les noeuds dans un ordre aleatoire pour ne pas ajouter des couleurs trop similaires à la suite,
-        ce qui donnerait un arbre déséquilibré et donc une erreur lors de la construction de la palette, puisque
-        une branche de l'arbre serait (quasiment) vide */
-        ArrayList<Integer> indicesAleatoires = new ArrayList<>();
-        for (int i = 0 ; i < liste.length ; i++){
-            indicesAleatoires.add(i);
+    //Construit un KDTree a partir d'une liste de noeuds representant des pixels
+    private void buildFromNodes(List<Node> list, int compteur) {
+
+        if (list.size() == 0) {
+            return;
         }
-        Collections.shuffle(indicesAleatoires);
-        this.tete = liste[indicesAleatoires.get(0)];
-        this.tete.setHyperplanTete();
-        for (int i = 1 ; i < liste.length ; i++){
-            this.addNode(liste[indicesAleatoires.get(i)]);
-        }
+
+        list.sort(new Comparator<Node>() {
+            @Override
+            public int compare(Node node, Node t1) {
+                if (node.coord[compteur] < t1.coord[compteur]) {
+                    return 1;
+                } else if (node.coord[compteur] > t1.coord[compteur]) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+        Node median = list.remove(list.size() / 2);
+
+        this.tete = median;
+        this.filsG = new KDTree();
+        this.filsG.buildFromNodes(list.subList(0, list.size() / 2), (compteur + 1) % 3);
+        this.filsD = new KDTree();
+        this.filsD.buildFromNodes(list.subList(list.size() / 2, list.size()), (compteur + 1) % 3);
+
     }
 
-    //Construit un KDTree à partir d'une liste de pixels de façon naïve, en les ajoutant 1 à 1
-    public void buildFromArrayNaive(int[][] array){
-        this.buildFromNodesNaive(buildNodeList(array));
-    }
+    //Construit un KDTree a partir d'un tableau de pixels
+    public void buildFromArray(int[][] array) {this.buildFromNodes(buildNodeList(array), 0);}
 
-    //Non utilisé finalement, calcule le  pixel moyen d'un arbre
+    //Non utilisé finalement (trop complexe), calcule le  pixel moyen d'un arbre
     /*private int[] moyenne(){
         int[] moy = new int[dimension];
-        if (filsD == null || filsG == null){
-            for (int i = 0 ; i < dimension ; i++){
-                moy[i] = (filsD.tete.coord[i] + filsG.tete.coord[i]) / 2;
+        if (filsG != null && filsD != null) {
+            for (int i = 0 ; i < dimension ; i++) {
+                moy[i] = (filsG.moyenne()[i] + filsD.moyenne()[i]) / 2;
             }
+        } else if (filsG != null){
+            moy = filsG.moyenne();
+        } else if (filsD != null) {
+            moy = filsD.moyenne();
         } else {
-            for (int i = 0 ; i < dimension ; i++){
-                moy[i] = (filsD.moyenne()[i] + filsG.moyenne()[i]) / 2;
+            for (int i = 0 ; i < dimension ; i++) {
+                moy[i] = 122;
             }
         }
         return moy;
@@ -160,6 +179,7 @@ public class KDTree {
         ArrayList<KDTree> layer = this.getLayer(powOf2);
         for (int i = 0 ; i < layer.size() ; i++){
             palette[i] = layer.get(i).tete.coord;
+            //palette[i] = layer.get(i).moyenne();
         }
         return palette;
     }

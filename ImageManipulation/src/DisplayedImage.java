@@ -23,7 +23,7 @@ public class DisplayedImage extends JPanel {
         }
     }
     		
-    	public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
+    public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
     		return this.image;
     	}
     	
