@@ -10,44 +10,9 @@ public class KDTree {
     private class Node {
 
         private int[] coord;
-        private int[] hyperplan = new int[dimension + 1];    /* Contient les coefficients de l'equation d'hyperplan
-                                            a*x + b*y + c*z + ... + cste = 0 */
 
         private Node(int[] coordonnees){
             coord = coordonnees;
-        }
-
-
-        /* Retourne true si le noeud est a gauche de l'hyperplan de l'autreNoeud */
-        boolean estAGauche(Node autreNoeud){
-            int somme = 0;
-            for (int i = 0 ; i < dimension ; i++){
-                somme += autreNoeud.hyperplan[i] * this.coord[i];
-            }
-            somme += autreNoeud.hyperplan[dimension];
-            return somme < 0;
-        }
-
-        /* Construit un hyperplan normal à celui du noeud pere */
-        void setHyperplan(Node pere){
-            for (int i = 0 ; i < dimension ; i++) {
-                hyperplan[i] = pere.hyperplan[(i + 1) % dimension];
-            }
-            hyperplan[dimension] = - (hyperplan[0] * coord[0] + hyperplan[1] * coord[1] + hyperplan[2] * coord[2]);
-            /*hyperplan[dimension] = 0;
-            for (int i = 0 ; i < dimension ; i++) {
-                hyperplan[dimension] -= (pere.hyperplan[i] * coord[i]);
-            }*/
-        }
-
-        /* Attribue un hyperplan arbitraire, utile pour attribuer un hyperplan au premier
-        noeud de l'arbre */
-        void setHyperplanTete(){
-            hyperplan[0] = 1;
-            for (int i = 1 ; i < dimension ; i++){
-                hyperplan[i] = 0;
-            }
-            hyperplan[dimension] = - (hyperplan[0] * coord[0]);
         }
 
     }
@@ -73,31 +38,6 @@ public class KDTree {
         filsD = null;
     }
 
-
-    //Ajoute un noeud à un KDTree, inutile pour le TD, utile seulement pour les tests
-    /*void addNode(Node node){
-
-        if (node.estAGauche(this.tete)){
-
-            if (this.filsG == null){
-                this.filsG = new KDTree(node);
-                node.setHyperplan(this.tete);
-            } else {
-                this.filsG.addNode(node);
-            }
-
-        } else {
-
-            if (this.filsD == null){
-                this.filsD = new KDTree(node);
-                node.setHyperplan(this.tete);
-            } else {
-                this.filsD.addNode(node);
-            }
-
-        }
-
-    }*/
 
     //Construit une liste de noeuds a partir d'un tableau de pixels
     private List<Node> buildNodeList(int[][] pixels) {
@@ -131,9 +71,9 @@ public class KDTree {
 
         this.tete = median;
         this.filsG = new KDTree();
-        this.filsG.buildFromNodes(list.subList(0, list.size() / 2), (compteur + 1) % 3);
+        this.filsG.buildFromNodes(list.subList(0, list.size() / 2), (compteur + 1) % dimension);
         this.filsD = new KDTree();
-        this.filsD.buildFromNodes(list.subList(list.size() / 2, list.size()), (compteur + 1) % 3);
+        this.filsD.buildFromNodes(list.subList(list.size() / 2, list.size()), (compteur + 1) % dimension);
 
     }
 
