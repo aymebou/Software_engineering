@@ -1,51 +1,52 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+
+import org.jfree.ui.HorizontalAlignment;
+
 import static java.lang.Math.pow;
 
 public class KDTree {
 
     private class Node {
 
-        private int[] coord;
-        private int[] hyperplan = new int[dimension + 1];    /* Contient les coefficients de l'equation d'hyperplan
-                                            a*x + b*y + c*z + ... + cste = 0 */
-        private Node(int[] coordonnees){
-            coord = coordonnees;
+        private int[] coord; //coord[0] = x; coord[1] = y
+        private int direction; //direction = 0 si verticale, 1 si horizontale, 2 si côte.
+        
+        private Node(int[] position){
+            coord = position;
+            direction = 0;
         }
 
 
         /* Retourne true si le noeud est a gauche de l'hyperplan de l'autreNoeud */
-        boolean estAGauche(Node autreNoeud){
-            int somme = 0;
-            for (int i = 0 ; i < dimension ; i++){
-                somme += autreNoeud.hyperplan[i] * this.coord[i];
-            }
-            somme += autreNoeud.hyperplan[dimension];
-            return somme < 0;
+        public boolean isLeft(Node other){
+        		return this.coord[this.direction] > other.coord[this.direction];
         }
-
-        /* Construit un hyperplan normal à celui du noeud pere */
-        void setHyperplan(Node pere){
-            hyperplan[0] = - pere.hyperplan[1];
-            hyperplan[1] = pere.hyperplan[0];
-            for (int i = 2 ; i < dimension ; i++){
-                hyperplan[i] = 0;
-            }
-            hyperplan[dimension] = - (hyperplan[0] * coord[0] + hyperplan[1] * coord[1]);
+        public void setDirection(int dir) {
+        		this.direction = dir;
         }
-
-        /* Attribue un hyperplan arbitraire, utile pour attribuer un hyperplan au premier
-        noeud de l'arbre */
-        void setHyperplanTete(){
-            hyperplan[0] = 1;
-            for (int i = 1 ; i < dimension ; i++){
-                hyperplan[i] = 0;
-            }
-            hyperplan[dimension] = - (hyperplan[0] * coord[0]);
+        public int getDirection() {
+        		return this.direction;
         }
-
     }
 
+    private class Pixel{
+    	
+    		private int[] color;
+    		
+    		public Pixel(int[] rgb) {
+    			color = rgb;
+    		}
+    		
+    		public int getColor(int ind) {
+    			return this.color[ind];
+    		}
+    		
+    		public int[] getCoord() {
+    			return this.color;
+    		}
+    }
     private int dimension = 3;
     private Node tete;
     private KDTree filsG;
@@ -53,12 +54,9 @@ public class KDTree {
 
 
     public KDTree(Node noeudTete){
-
         tete = noeudTete;
-
         filsG = null;
         filsD = null;
-
     }
 
     public KDTree() {
@@ -67,30 +65,97 @@ public class KDTree {
         filsD = null;
     }
 
-
-
-    void addNode(Node node){
-
-        if (node.estAGauche(this.tete)){
+    public void addNode(Node node){
+    	
+        if (node.isLeft(this.tete)){
 
             if (this.filsG == null){
                 this.filsG = new KDTree(node);
-                node.setHyperplan(this.tete);
+                node.setDirection((this.tete.getDirection() + 1) % 2);
             } else {
                 this.filsG.addNode(node);
             }
-
         } else {
 
             if (this.filsD == null){
                 this.filsD = new KDTree(node);
-                node.setHyperplan(this.tete);
+                node.setDirection((this.tete.getDirection() + 1) % 2);
             } else {
                 this.filsD.addNode(node);
             }
-
         }
-
+    }
+   
+    public void initFromArray(ArrayList<Pixel> array) {
+    		ArrayList<Pixel> rArray = new ArrayList<Pixel>();
+    		ArrayList<Pixel> gArray = new ArrayList<Pixel>();
+    		ArrayList<Pixel> bArray = new ArrayList<Pixel>();
+    		for(int i = 0; i < array.size(); i++) {
+    			rArray.add(array.get(i));
+    			gArray.add(array.get(i));
+    			bArray.add(array.get(i));
+    		}
+    		rArray.sort(new Comparator<Pixel>() {
+			public int compare(Pixel o1, Pixel o2) {
+				if(o1.getColor(0) < o2.getColor(0)) {
+					return 1;
+				}
+				else if(o1.getColor(0) > o2.getColor(0)) {
+					return -1;
+				}
+				else {
+					return 0;
+				}	
+			}
+    		});	
+    		gArray.sort(new Comparator<Pixel>() {
+    			public int compare(Pixel o1, Pixel o2) {
+    				if(o1.getColor(1) < o2.getColor(1)) {
+    					return 1;
+    				}
+    				else if(o1.getColor(1) > o2.getColor(1)) {
+    					return -1;
+    				}
+    				else {
+    					return 0;
+    				}	
+    			}
+        	});
+        	bArray.sort(new Comparator<Pixel>() {
+    			public int compare(Pixel o1, Pixel o2) {
+    				if(o1.getColor(2) < o2.getColor(2)) {
+    					return 1;
+    				}
+    				else if(o1.getColor(2) > o2.getColor(2)) {
+    					return -1;
+    				}
+    				else {
+    					return 0;
+    				}	
+    			}
+        	});
+        	int i = 0;
+        	while(array.size() > 0) {
+        		Pixel medPixel;
+        		if(i == 0) {
+        			medPixel = rArray.get(rArray.size()/2);
+        		}
+        		if(i == 1) {
+        			medPixel = gArray.get(gArray.size()/2);
+        		}
+        		else {
+        			medPixel = bArray.get(bArray.size()/2);
+        		}
+        		rArray.remove(medPixel);
+        		gArray.remove(medPixel);
+        		bArray.remove(medPixel);
+        		
+        		Node noeud = new Node(medPixel.getCoord());
+        		noeud.setDirection(i);
+        		this.addNode(noeud);
+        		
+        		i = (i + 1) % 3;
+        	}
     }
 
     //Construit une liste de noeuds à partir d'une liste de pixels (liste de triplets RGB)
@@ -114,7 +179,7 @@ public class KDTree {
         }
         Collections.shuffle(indicesAleatoires);
         this.tete = liste[indicesAleatoires.get(0)];
-        this.tete.setHyperplanTete();
+    //    this.tete.setHyperplanTete();
         for (int i = 1 ; i < liste.length ; i++){
             this.addNode(liste[indicesAleatoires.get(i)]);
         }
@@ -163,5 +228,4 @@ public class KDTree {
         }
         return palette;
     }
-
 }

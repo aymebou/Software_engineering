@@ -30,7 +30,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JButton buttonInversion = new JButton("Inversion"); 	//Crée un nouveau bouton "Inversion"
 	private JButton buttonHisto = new JButton("Histogramme");		//Crée un nouveau bouton "Histogramme"
     private JButton buttonCompress = new JButton("Compresser");
-
+ 
     /* Création du menu déroulant File */
 	private JMenuBar menuBar = new JMenuBar();
 	private JMenu fileMenu = new JMenu("File");

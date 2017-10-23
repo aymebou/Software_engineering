@@ -16,11 +16,11 @@ public class BarChartInt extends ApplicationFrame {
 		      JFreeChart barChart = ChartFactory.createBarChart(
 		         chartTitle,           
 		         "Category",            
-		         "Score",            
+		         "Score",             
 		         createDataset(),          
 		         PlotOrientation.VERTICAL,           
 		         true, true, false);
-		         
+		          
 		      ChartPanel chartPanel = new ChartPanel( barChart );        
 		      chartPanel.setPreferredSize(new java.awt.Dimension( 560 , 367 ) );        
 		      setContentPane( chartPanel ); 
