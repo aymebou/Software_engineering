@@ -22,6 +22,8 @@ public class DisplayedImage extends JPanel {
             e.printStackTrace();
         }
     }
+    
+    
     		
     public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
     		return this.image;
@@ -34,13 +36,22 @@ public class DisplayedImage extends JPanel {
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 Color color = new Color(image.getRGB(i, j));			//Création d'un objet color. Puis modification de ses couleurs
-                int blue = Math.abs(color.getBlue() - 255);
-                int red = Math.abs(color.getRed() - 255);
-                int green = Math.abs(color.getGreen() - 255);
+                int blue = 255 - color.getBlue();
+                int red = 255 - color.getRed();
+                int green = 255 - color.getGreen();
 
                 image.setRGB(i,  j, new Color(red, green, blue).getRGB());	//Modification des couleurs de l'image.
             }
         }
+    }
+    
+    public void setColor(int[] rgb) {
+    		for(int i = 0; i < this.getWidth(); i++) {
+    			for(int j = 0; j < this.getHeight(); j++) {
+    				Color color = new Color(rgb[0], rgb[1], rgb[2]);
+    				this.image.setRGB(i,  j,  color.getRGB());
+    			}
+    		}
     }
 
     public int[] getColor() {
@@ -64,7 +75,7 @@ public class DisplayedImage extends JPanel {
         }
         return res;
     }
-
+    
 
 
     /* Retourne un tableau contenat les 3 composantes RGB de chacun des pixels */
@@ -108,7 +119,17 @@ public class DisplayedImage extends JPanel {
         }
     }
 
-
+    public void createPalette(int[][] palette) {
+    		this.setImage(new File("/Users/gauthierpanisset/Documents/Workspace/Software_engineering/Palette.png"));
+    		for(int i = 0; i < 16; i++) {
+    			for(int j = 0; j < 20; j++) {
+    				for(int k = 0; k < 20; k++) {
+    					Color color = new Color(palette[i][0], palette[i][1], palette[i][2]);
+    					this.image.setRGB(j, i*22 + k, color.getRGB());
+    				}
+    			}
+    		}
+    }
     	
     public void paintComponent(Graphics g){
     		//g.drawImage(image, 0, 0, this); // draw as much as possible
