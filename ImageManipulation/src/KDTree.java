@@ -76,6 +76,10 @@ public class KDTree {
     //Construit un KDTree a partir d'un tableau de pixels
     public void buildFromArray(int[][] array) {this.buildFromNodes(buildNodeList(array), 0);}
 
+<<<<<<< HEAD
+=======
+    //calcule le  pixel moyen d'un arbre
+>>>>>>> f3286e7c7c6a34030172bb85556abcd853f212c3
     private int[] moyenne(){
         int[] moy = new int[dimension];
         if (filsG.tete != null && filsD.tete != null) {
