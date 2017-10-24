@@ -1,8 +1,5 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-
-import org.jfree.ui.HorizontalAlignment;
 
 import static java.lang.Math.pow;
 
@@ -21,17 +18,20 @@ public class KDTree {
 
         /* Retourne true si le noeud est a gauche de l'hyperplan de l'autreNoeud */
         public boolean isLeft(Node other){
-        		return this.coord[this.direction] > other.coord[this.direction];
+        		return coord[direction] > other.coord[direction];
         }
+        
         public void setDirection(int dir) {
-        		this.direction = dir;
+        		direction = dir;
         }
+        
         public int getDirection() {
-        		return this.direction;
+        		return direction;
         }
+      
     }
 
-    private class Pixel{
+    public class Pixel{
     	
     		private int[] color;
     		
@@ -40,13 +40,15 @@ public class KDTree {
     		}
     		
     		public int getColor(int ind) {
-    			return this.color[ind];
+    			return color[ind];
     		}
     		
     		public int[] getCoord() {
-    			return this.color;
+    			return color;
     		}
+    		
     }
+    
     private int dimension = 3;
     private Node tete;
     private KDTree filsG;
@@ -64,29 +66,50 @@ public class KDTree {
         filsG = null;
         filsD = null;
     }
+    
+    public boolean isLeaf() {
+    		return (filsG == null || filsD == null);
+    }
 
     public void addNode(Node node){
-    	
-        if (node.isLeft(this.tete)){
+    		
+    		if (tete == null) {
+    			tete = node;
+    		}
+    		else if (node.isLeft(tete)){
 
-            if (this.filsG == null){
-                this.filsG = new KDTree(node);
-                node.setDirection((this.tete.getDirection() + 1) % 2);
+            if (filsG == null){
+                filsG = new KDTree(node);
+                node.setDirection((tete.getDirection() + 1) % 2);
             } else {
-                this.filsG.addNode(node);
+                filsG.addNode(node);
             }
         } else {
 
-            if (this.filsD == null){
-                this.filsD = new KDTree(node);
-                node.setDirection((this.tete.getDirection() + 1) % 2);
+            if (filsD == null){
+                filsD = new KDTree(node);
+                node.setDirection((tete.getDirection() + 1) % 2);
             } else {
-                this.filsD.addNode(node);
+                filsD.addNode(node);
             }
         }
     }
    
+    ArrayList<Pixel> toArrayPixel(int[][] pixels) {
+		ArrayList<Pixel> array = new ArrayList<Pixel>();
+		for(int i = 0; i < pixels.length; i++) {
+			Pixel pix = new Pixel(pixels[i]);
+			array.add(pix);
+		}
+		return array;
+	}
+    
+    public void initFromList(int[][] list) {
+    		this.initFromArray(toArrayPixel(list));
+    }
+    
     public void initFromArray(ArrayList<Pixel> array) {
+    		System.out.println("initFromArray start");
     		ArrayList<Pixel> rArray = new ArrayList<Pixel>();
     		ArrayList<Pixel> gArray = new ArrayList<Pixel>();
     		ArrayList<Pixel> bArray = new ArrayList<Pixel>();
@@ -135,7 +158,7 @@ public class KDTree {
     			}
         	});
         	int i = 0;
-        	while(array.size() > 0) {
+        	while(rArray.size() > 0) {
         		Pixel medPixel;
         		if(i == 0) {
         			medPixel = rArray.get(rArray.size()/2);
@@ -156,23 +179,24 @@ public class KDTree {
         		
         		i = (i + 1) % 3;
         	}
+        	System.out.println("initFromArray end");
     }
 
-    //Construit une liste de noeuds à partir d'une liste de pixels (liste de triplets RGB)
+    /*Construit une liste de noeuds à partir d'une liste de pixels (liste de triplets RGB)
     private Node[] buildNodeList(int[][] pixels) {
         Node[] nodes = new Node[pixels.length];
         for (int i = 0 ; i < nodes.length ; i++) {
             nodes[i] = new Node(pixels[i]);
         }
         return nodes;
-    }
+    }*/
 
     /* Construit naivement un KDTree a partir d'une liste de noeuds en les
-    ajoutant un par un */
+    ajoutant un par un
     private void buildFromNodesNaive(Node[] liste) {
-        /* On ajoute les noeuds dans un ordre aleatoire pour ne pas ajouter des couleurs trop similaires à la suite,
+        On ajoute les noeuds dans un ordre aleatoire pour ne pas ajouter des couleurs trop similaires à la suite,
         ce qui donnerait un arbre déséquilibré et donc une erreur lors de la construction de la palette, puisque
-        une branche de l'arbre serait (quasiment) vide */
+        une branche de l'arbre serait (quasiment) vide 
         ArrayList<Integer> indicesAleatoires = new ArrayList<>();
         for (int i = 0 ; i < liste.length ; i++){
             indicesAleatoires.add(i);
@@ -188,7 +212,7 @@ public class KDTree {
     //Construit un KDTree à partir d'une liste de pixels de façon naïve, en les ajoutant 1 à 1
     public void buildFromArrayNaive(int[][] array){
         this.buildFromNodesNaive(buildNodeList(array));
-    }
+    } */
 
     //Non utilisé finalement, calcule le  pixel moyen d'un arbre
     /*private int[] moyenne(){
@@ -207,13 +231,16 @@ public class KDTree {
 
     /* Retourne la liste des 2^n sous-arbres de la couche n d'un arbre */
     private ArrayList<KDTree> getLayer(int n){
-        ArrayList<KDTree> list = new ArrayList<>();
-        if (n == 0){
+    		System.out.println("getLayer");
+        ArrayList<KDTree> list = new ArrayList<KDTree>();
+        if (n == 0 || this.isLeaf()){
             list.add(this);
+            System.out.println("Coucou");
             return list;
         } else {
-            list = this.filsD.getLayer(n - 1);
-            list.addAll(this.filsG.getLayer(n - 1));
+        		
+            list = filsD.getLayer(n - 1);
+            list.addAll(filsG.getLayer(n - 1));
             return list;
         }
     }
@@ -221,11 +248,14 @@ public class KDTree {
     /* Construit une palette de 2^powOf2 couleurs en choisissant les pixels de tete
     des sous-arbres de la couche n du KDTree stockant les pixels de l'image */
     public int[][] buildPalette(int powOf2){
+    		System.out.println("buildPalette" + powOf2);
         int[][] palette = new int[(int)pow(2, powOf2)][dimension];
         ArrayList<KDTree> layer = this.getLayer(powOf2);
         for (int i = 0 ; i < layer.size() ; i++){
             palette[i] = layer.get(i).tete.coord;
         }
+        System.out.println("buildPalette end" + palette[0] + palette[1]);
         return palette;
+        
     }
 }
