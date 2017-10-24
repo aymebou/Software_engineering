@@ -13,7 +13,6 @@ public class KDTree {
         private Node(int[] coordonnees){
             coord = coordonnees;
         }
-
     }
 
     private int dimension = 3;
@@ -25,10 +24,8 @@ public class KDTree {
     public KDTree(Node noeudTete){
 
         tete = noeudTete;
-
         filsG = null;
         filsD = null;
-
     }
 
     public KDTree() {
@@ -36,7 +33,8 @@ public class KDTree {
         filsG = null;
         filsD = null;
     }
-
+    	
+    
 
     //Construit une liste de noeuds a partir d'un tableau de pixels
     private List<Node> buildNodeList(int[][] pixels) {
@@ -73,30 +71,30 @@ public class KDTree {
         this.filsG.buildFromNodes(list.subList(0, list.size() / 2), (compteur + 1) % dimension);
         this.filsD = new KDTree();
         this.filsD.buildFromNodes(list.subList(list.size() / 2, list.size()), (compteur + 1) % dimension);
-
     }
 
     //Construit un KDTree a partir d'un tableau de pixels
     public void buildFromArray(int[][] array) {this.buildFromNodes(buildNodeList(array), 0);}
 
-    //Non utilisé finalement (trop complexe), calcule le  pixel moyen d'un arbre
-    /*private int[] moyenne(){
+    private int[] moyenne(){
         int[] moy = new int[dimension];
-        if (filsG != null && filsD != null) {
+        if (filsG.tete != null && filsD.tete != null) {
+            int[] moyG = filsG.moyenne();
+            int[] moyD = filsD.moyenne();
             for (int i = 0 ; i < dimension ; i++) {
-                moy[i] = (filsG.moyenne()[i] + filsD.moyenne()[i]) / 2;
+                moy[i] = (moyG[i] + moyD[i]) / 2;
             }
-        } else if (filsG != null){
+        } else if (filsG.tete != null){
             moy = filsG.moyenne();
-        } else if (filsD != null) {
+        } else if (filsD.tete != null) {
             moy = filsD.moyenne();
         } else {
             for (int i = 0 ; i < dimension ; i++) {
-                moy[i] = 122;
+                moy[i] = this.tete.coord[i];
             }
         }
         return moy;
-    }*/
+    }
 
     /* Retourne la liste des 2^n sous-arbres de la couche n d'un arbre */
     private ArrayList<KDTree> getLayer(int n){
@@ -117,8 +115,8 @@ public class KDTree {
         int[][] palette = new int[(int)pow(2, powOf2)][dimension];
         ArrayList<KDTree> layer = this.getLayer(powOf2);
         for (int i = 0 ; i < layer.size() ; i++){
-            palette[i] = layer.get(i).tete.coord;
-            //palette[i] = layer.get(i).moyenne();
+            //palette[i] = layer.get(i).tete.coord;
+            palette[i] = layer.get(i).moyenne();
         }
         return palette;
     }

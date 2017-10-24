@@ -90,6 +90,7 @@ public class DisplayedImage extends JPanel {
         for (int k = 1 ; k < palette.length ; k++){
             int distance = (int)pow((pixel[0] - palette[k][0]), 2) + (int)pow((pixel[1] - palette[k][1]), 2) + (int)pow((pixel[2] - palette[k][2]), 2);
             if (distance < min){
+            		min = distance;
                 color = new Color(palette[k][0], palette[k][1], palette[k][2]);
             }
         }
