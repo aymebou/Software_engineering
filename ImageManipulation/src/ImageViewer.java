@@ -11,9 +11,10 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -27,7 +28,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private DisplayedImage ouputImage = new DisplayedImage();
 	
 	/*Création de l'affichage palette */
-	private DisplayedImage paletteDisp = new DisplayedImage();
+	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
 	
 	/* Création des boutons d'actions */
 	private JButton buttonAction = new JButton("Action");
@@ -67,16 +68,16 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
 		output.add(ouputImage); 		
 		
-		JPanel palettePanel = new JPanel();
-		palettePanel.setLayout(new BoxLayout(palettePanel, BoxLayout.PAGE_AXIS));
-		palettePanel.add(paletteDisp);
+		JPanel paletteG = new JPanel();
+		paletteG.setLayout(new BoxLayout(paletteG, BoxLayout.PAGE_AXIS));
+		paletteG.add(paletteDisp);
 		
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
 		global.add(input);
 		global.add(action);
 		global.add(output);
-		global.add(palettePanel);
+		global.add(paletteG);
 
 		this.getContentPane().add(global);
 
@@ -189,5 +190,6 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
             ouputImage.repaint();
         }
     }
+	
 
 }
