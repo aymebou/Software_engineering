@@ -11,9 +11,12 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -27,7 +30,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private DisplayedImage ouputImage = new DisplayedImage();
 	
 	/*Création de l'affichage palette */
-	private DisplayedImage paletteDisp = new DisplayedImage();
+	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
 	
 	/* Création des boutons d'actions */
 	private JButton buttonAction = new JButton("Action");
@@ -49,10 +52,12 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	
 		JPanel input = new JPanel();
 		input.setLayout(new BoxLayout(input, BoxLayout.PAGE_AXIS));
+		input.setPreferredSize(new Dimension(400, 400));
 		input.add(inputImage);
 
 		JPanel action = new JPanel();
-		action.setLayout(new BoxLayout(action, BoxLayout.PAGE_AXIS));
+		action.setLayout(new GridLayout(4,1));// BoxLayout(action, BoxLayout.PAGE_AXIS));
+		action.setMaximumSize(new Dimension(80, 400));
 		action.add(buttonAction);
 		// Defines action associated to buttons
 		buttonAction.addActionListener(new ButtonListener());
@@ -65,20 +70,23 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 
 		JPanel output = new JPanel();
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
+		output.setPreferredSize(new Dimension(400, 400));
 		output.add(ouputImage); 		
 		
-		JPanel palettePanel = new JPanel();
-		palettePanel.setLayout(new BoxLayout(palettePanel, BoxLayout.PAGE_AXIS));
-		palettePanel.add(paletteDisp);
+		JPanel paletteG = new JPanel();
+		paletteG.setLayout(new BoxLayout(paletteG, BoxLayout.PAGE_AXIS)); //new BorderLayout());
+		paletteG.setMinimumSize(new Dimension(40, 400));
+		paletteG.add("East", paletteDisp);
 		
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
 		global.add(input);
 		global.add(action);
 		global.add(output);
-		global.add(palettePanel);
+		global.add(paletteG);
 
 		this.getContentPane().add(global);
+		
 
 		/* Définition de la fonction Open */
 		itemOpen.addActionListener(new ActionListener() {
@@ -189,5 +197,6 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
             ouputImage.repaint();
         }
     }
+	
 
 }

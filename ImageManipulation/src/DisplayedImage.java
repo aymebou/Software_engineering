@@ -14,6 +14,10 @@ public class DisplayedImage extends JPanel {
     
     public DisplayedImage() {
     }
+    
+    public DisplayedImage(int x, int y, int type) {
+    		image = new BufferedImage(x, y, type);
+    }
     	
     public void setImage(File imageName) {			//Modifie l'image.
         try {
@@ -120,7 +124,7 @@ public class DisplayedImage extends JPanel {
     }
 
     public void createPalette(int[][] palette) {
-    		this.setImage(new File("/Users/gauthierpanisset/Documents/Workspace/Software_engineering/Palette.png"));
+    		
     		for(int i = 0; i < 16; i++) {
     			for(int j = 0; j < 20; j++) {
     				for(int k = 0; k < 20; k++) {
@@ -130,6 +134,7 @@ public class DisplayedImage extends JPanel {
     			}
     		}
     }
+    
     	
     public void paintComponent(Graphics g){
     		//g.drawImage(image, 0, 0, this); // draw as much as possible
