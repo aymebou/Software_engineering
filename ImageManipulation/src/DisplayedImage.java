@@ -128,8 +128,6 @@ public class DisplayedImage extends JPanel {
     		for(int i = 0; i < 16; i++) {
     			for(int j = 0; j < 20; j++) {
     				for(int k = 0; k < 20; k++) {
-    					System.out.println("j : " + j + "\n");
-    					System.out.println("i : " + (i*22 + k));
     					Color color = new Color(palette[i][0], palette[i][1], palette[i][2]);
     					this.image.setRGB(j, i*22 + k, color.getRGB());
     				}
