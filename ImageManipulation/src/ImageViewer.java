@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -21,10 +20,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 
-
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
-
     /* Création des images */
     private DisplayedImage inputImage = new DisplayedImage();
 	private DisplayedImage ouputImage = new DisplayedImage();
@@ -76,7 +73,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		JPanel paletteG = new JPanel();
 		paletteG.setLayout(new BoxLayout(paletteG, BoxLayout.PAGE_AXIS)); //new BorderLayout());
 		paletteG.setMinimumSize(new Dimension(40, 400));
-		paletteG.add("East", paletteDisp);
+		paletteG.add(paletteDisp);
 		
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
@@ -84,6 +81,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		global.add(action);
 		global.add(output);
 		global.add(paletteG);
+
 
 		this.getContentPane().add(global);
 		
@@ -192,7 +190,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	        colorsTree.buildFromArray(pixels);      //stocke tous les pixels dans le KDTree
             int[][] palette = colorsTree.buildPalette(4);  //construit une palette de 2^n couleurs
             paletteDisp.createPalette(palette);
-            paletteDisp.repaint();
+            	paletteDisp.repaint();
             ouputImage.compress(palette, pixels);
             ouputImage.repaint();
         }
