@@ -187,10 +187,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	    		
 	        int[][] pixels = inputImage.buildPixelArray(); //contiendra les 3 composantes de chaque pixel
 	        KDTree colorsTree = new KDTree();
-	        colorsTree.buildFromArray(pixels);      //stocke tous les pixels dans le KDTree
-            int[][] palette = colorsTree.buildPalette(4);  //construit une palette de 2^n couleurs
+	        colorsTree.buildNLayersFromArray(pixels, 4);      //stocke certains les pixels dans le KDTree
+            int[][] palette = colorsTree.buildPalette(4);  //construit une palette de 2^powOf2 couleurs (
             paletteDisp.createPalette(palette);
-            	paletteDisp.repaint();
+			paletteDisp.repaint();
             ouputImage.compress(palette, pixels);
             ouputImage.repaint();
         }
