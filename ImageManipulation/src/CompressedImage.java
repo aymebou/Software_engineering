@@ -13,7 +13,7 @@ import java.io.OutputStream;
 public class CompressedImage {
 	//Définition d'une image compressée : fichier non propriétaire, écrit en binaire
 	/* On code sur 2 octets la hauteur d'abord puis sur 2 octets également la largeur
-	 * Vient aussi la taille de la palette, sur 2 octet.
+	 * Vient aussi la taille de la palette, sur 2 octets.
 	 * En soi, il faudrait rester cohérent et stocker la taille de la palette sur 1 octet, comme 
 	 * les positions sont stockées sur 1 octet mais bon...
 	 * 
@@ -36,7 +36,8 @@ public class CompressedImage {
 	
 
 	//initialisation à partir des données classiques
-	public void CompressedImage (int h_int, int w_int,int paletteSize_int, int [][] palette_int, int [] pixelList_int ) {
+	public void CompressedImage (int h_int, int w_int,int paletteSize_int, 
+									int [][] palette_int, int [] pixelList_int ) {
 		
 		//h, w et paletteSize :
 		h = intToTwoOctet(h_int);
@@ -75,9 +76,9 @@ public class CompressedImage {
 
 	
 	//Fonction auxiliaires de conversion en bits, très pratique
-	private byte [] intToTwoOctet(int n) {
-		byte byte2 = (byte) (n >> 7);
-		byte byte1 = (byte) (n - n>>7) ;
+	static byte [] intToTwoOctet(int n) {
+		byte byte1 = (byte) (n & 0x7F);
+		byte byte2 = (byte) ((n >> 7) & 0x7F);
 		byte [] table = {byte1,byte2};
 		return table;
 	}
@@ -145,23 +146,33 @@ public class CompressedImage {
 	
 	private int byteTwoToInt(byte [] table) {
 		//Fonction bien spécifique au cas présent, données bin codées sur 2 octets
-		int result = (int) table [0] + (int) table[1] >> 7;
+		int result = (int) table [0] + (int) (table[1] *128);
 		return result;
 	}
 	
 	public void openFromFile(String fileName) throws IOException {
 	    FileInputStream input = null;
-		byte [] h_byte = new byte [2];
-		byte [] w_byte = new byte [2];
-		byte [] paletteSize;
-		int i;
+		h = new byte [2];
+		w = new byte [2];
+		paletteSize = new byte [2];
+		byte [] palette;
+		byte [] pixelList;
+		
 	    try {
 			input = new FileInputStream(fileName);
-		    i = input.read(h_byte); 
-		    i = input.read(w_byte);
-		    
-		    
-		    
+			//Maintenant, stockons
+			// Le read fonctionne comme en C, on a un pointeur qui se souvient de l'endroit où on est.
+		    input.read(h);
+		    input.read(w);
+		    int h_int = byteTwoToInt(h);
+		    int w_int = byteTwoToInt(w);
+		    input.read(paletteSize);
+		    int paletteSize_int = byteTwoToInt(paletteSize);
+		    palette = new 	byte [paletteSize_int * 6];
+		    input.read(palette);
+		    pixelList = new byte [h_int*w_int];
+		    input.read(pixelList); 
+		    		    
 
 		} catch(Exception ex) {
 	        
