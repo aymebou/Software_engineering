@@ -18,6 +18,11 @@ public class DisplayedImage extends JPanel {
     public DisplayedImage(int x, int y, int type) {
     		image = new BufferedImage(x, y, type);
     }
+    
+    public void setPixelColor(int x, int y, Color color) {
+    	int rgb = color.getRGB();
+    	image.setRGB(x, y, rgb);
+    }
     	
     public void setImage(File imageName) {			//Modifie l'image.
         try {
@@ -25,8 +30,7 @@ public class DisplayedImage extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    
+    }    
     
     		
     public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
@@ -111,6 +115,8 @@ public class DisplayedImage extends JPanel {
         }
         this.image.setRGB(x, y, color.getRGB());
     }
+    
+
 
     /* Construit l'image compressée en appelant setBestColor pour chaque pixel */
     public void compress(int[][] palette, int[][] pixels){
@@ -133,6 +139,52 @@ public class DisplayedImage extends JPanel {
     				}
     			}
     		}
+    }
+    
+    /*
+     * AJOUTS POUR COMMUNIQUER AVEC LA CLASSE CompressedImage
+     * 
+     * 
+     */
+    
+    
+    // ici, on recheche les indice  mettre dans le tableau pour initialiser la classe 
+    private int findBestPaletteIndex(int x, int y, int[][] palette, int[] pixel){
+        Color color = new Color(palette[0][0], palette[0][1], palette[0][2]);
+        int bestIndex = 0;
+        int min = (int)pow((pixel[0] - palette[0][0]), 2) + (int)pow((pixel[1] - palette[0][1]), 2) + (int)pow((pixel[2] - palette[0][2]), 2);
+        for (int k = 1 ; k < palette.length ; k++){
+            int distance = (int)pow((pixel[0] - palette[k][0]), 2) + (int)pow((pixel[1] - palette[k][1]), 2) + (int)pow((pixel[2] - palette[k][2]), 2);
+            if (distance < min){
+            		min = distance;
+                bestIndex = k;
+            }
+        }
+        return bestIndex;
+    }
+    
+    // Ensuite, on construit la liste (et non le array, attention !)
+    private int [] findPixelListIndexes (int[][] palette, int[][] pixels){
+    	int w = this.image.getWidth();
+    	int h = this.image.getHeight();
+    	int [] pixelList = new int [w*h];
+    	for (int y = 0 ; y < h ; y++){
+            for (int x = 0 ; x < w ; x++){
+            	pixelList[y*w + x]= this.findBestPaletteIndex(x, y, palette, pixels[y * w + x]);
+            }
+    	}
+    	return pixelList;
+    }
+    
+    //Maintenant, on initie le convertisseur !
+    public CompressedImage displayedImageToCompressedImage (int [][] palette, int [][] pixels) {
+    	int h = this.image.getHeight();
+    	int w = this.image.getWidth();
+    	int paletteSize = palette.length;
+    	int [] pixelList = this.findPixelListIndexes(palette,pixels);
+    	
+    	CompressedImage comp = new CompressedImage();
+    	return comp;
     }
     	
     public void paintComponent(Graphics g){

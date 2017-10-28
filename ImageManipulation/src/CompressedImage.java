@@ -8,6 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+
 
 
 public class CompressedImage {
@@ -185,6 +188,45 @@ public class CompressedImage {
 	            input.close();
 	      }
 	    
+	}
+	public DisplayedImage compressedImageToDisplayedImage () {
+		DisplayedImage pic = new DisplayedImage(byteTwoToInt(w),byteTwoToInt(h),BufferedImage.TYPE_INT_ARGB);
+		
+		byte [] R_byte = new byte [2]; 
+		byte [] G_byte = new byte [2]; 
+		byte [] B_byte = new byte [2];
+		int x = 0; int y = 0;
+		for (int i= 0; i < byteTwoToInt(w) * byteTwoToInt(h) ;i++ ) {
+			//On définit les R, G et B :
+			
+			/*Dans la palette, tout est codé en byte, sur 2 cases, on prend alors en compte 
+			 *Les deux cases pour chacun.
+			 *
+			 *RAPPEL : dans la palette sont stockée à la suite les RGB des couleurs utilisées
+			 *DONC : une "case RGB" de la palette fait en réalité 6 cases byte
+			*/
+			R_byte = new byte [] { palette[(int) pixelList[6 * i]], 
+										palette[ (int) pixelList[6 * i+1] ]};
+			
+			G_byte = new byte [] { palette[(int) pixelList[6*i + 2]], 
+										palette[ (int) pixelList[6* i + 3] ]};
+				
+			B_byte = new byte [] { palette[(int) pixelList[6 * i + 4]], 
+										palette[ (int) pixelList[6 * i + 5] ]};
+			Color color = new Color(byteTwoToInt(R_byte),byteTwoToInt(G_byte),
+									byteTwoToInt(B_byte));
+			pic.setPixelColor(x, y, color);
+			
+			
+			if (i%byteTwoToInt(w) ==0) {
+				x=0;
+				y++;
+			}
+			else {
+				x++;
+			}
+		}
+	return pic;
 	}
 	
 	
