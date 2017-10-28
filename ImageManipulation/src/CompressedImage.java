@@ -143,9 +143,10 @@ public class CompressedImage {
 	    }	
 	}
 	
-	private int byteToInt(byte [] table, int size) {
-		//Fonction bien spécifique au cas présent, données bin et taille d'un entier ( 1 ou 2 octet(s) )
-		return 0;
+	private int byteTwoToInt(byte [] table) {
+		//Fonction bien spécifique au cas présent, données bin codées sur 2 octets
+		int result = (int) table [0] + (int) table[1] >> 7;
+		return result;
 	}
 	
 	public void openFromFile(String fileName) throws IOException {
