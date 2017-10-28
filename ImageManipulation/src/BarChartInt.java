@@ -1,17 +1,19 @@
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel; 
 import org.jfree.chart.JFreeChart; 
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset; 
 import org.jfree.data.category.DefaultCategoryDataset; 
-import org.jfree.ui.ApplicationFrame; 
 
-public class BarChartInt extends ApplicationFrame {
+public class BarChartInt extends JFrame {
 	
 		int[] data;
 	
 		   public BarChartInt( String applicationTitle , String chartTitle , int[] data ) {
-		      super( applicationTitle );    
+		      super( applicationTitle );
 		      this.data = data;
 		      JFreeChart barChart = ChartFactory.createBarChart(
 		         chartTitle,           
@@ -22,7 +24,7 @@ public class BarChartInt extends ApplicationFrame {
 		         true, true, false);
 		          
 		      ChartPanel chartPanel = new ChartPanel( barChart );        
-		      chartPanel.setPreferredSize(new java.awt.Dimension( 560 , 367 ) );        
+		      chartPanel.setPreferredSize(new java.awt.Dimension( 560 , 367 ) );
 		      setContentPane( chartPanel ); 
 		   }
 		   
