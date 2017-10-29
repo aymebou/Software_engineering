@@ -37,9 +37,9 @@ public class CompImage {
                 input.read(buff2);
                 width = twoBytesToInt(buff2);
 
-                /* L'octet suivant contient la taille de la palette */
-                input.read(buff1);
-                paletteSize = byteToInt(buff1[0]);
+                /* Les 2 octets suivants contiennent la taille de la palette */
+                input.read(buff2);
+                paletteSize = twoBytesToInt(buff2);
 
                 /* Chaque couleur de la palette est ensuite lue sur trois octets chacune */
                 palette = new int[paletteSize][3];
@@ -56,7 +56,7 @@ public class CompImage {
                     pixels.add(byteToInt(buff1[0]));
                 }
 
-                /* On stocke les informations lues dans la DisplayedImage de notre ComImage */
+                /* On stocke les informations lues dans la DisplayedImage de notre CompImage */
                 displayedImage = new DisplayedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 for (int x = 0 ; x < width ; x++){
                     for (int y = 0 ; y < height ; y++){
@@ -136,10 +136,10 @@ public class CompImage {
         this.buildData();
 
         /* On crée un tableau d'octets que l'on finira par écrire dans le fichier.
-         * On réserve 2 octets pour la hauteur, 2 octets pour la largeur, 1 pour la taille de la palette,
+         * On réserve 2 octets pour la hauteur, 2 octets pour la largeur, 2 pour la taille de la palette,
          * puis suffisammant pour stocker chaque couleur de la palette sur 3 octets, et enfin chaque indice
          * de la liste pixels sur 1 octet. */
-        byte[] toWrite = new byte[2 + 2 + 1 + 3*displayedImage.getPalette().length + displayedImage.getBuffer().getWidth()*displayedImage.getBuffer().getHeight() ];
+        byte[] toWrite = new byte[2 + 2 + 2 + 3*displayedImage.getPalette().length + displayedImage.getBuffer().getWidth()*displayedImage.getBuffer().getHeight() ];
 
         int offset = 0;
 
@@ -158,8 +158,11 @@ public class CompImage {
         offset += 2;
 
         //Taille de la palette
-        toWrite[offset] = intToByte(displayedImage.getPalette().length);
-        offset++;
+        byte[] palSize = intToTwoBytes(displayedImage.getPalette().length);
+        for (int i = 0 ; i < 2 ; i++){
+            toWrite[offset+i] = palSize[i];
+        }
+        offset += 2;
 
         //Couleurs de la palette
         for (int i = 0 ; i < displayedImage.getPalette().length ; i++){
