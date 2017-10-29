@@ -153,7 +153,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 				int returnval = dialogue.showSaveDialog(null);
 				if (returnval == JFileChooser.APPROVE_OPTION){
 					try {
-						Files.createFile(dialogue.getSelectedFile().toPath());
+					    if (!dialogue.getSelectedFile().exists())
+						    Files.createFile(dialogue.getSelectedFile().toPath());
 						CompImage toSave = new CompImage(ouputImage);
 						toSave.save(dialogue.getSelectedFile());
 					} catch(IOException e) {}
@@ -170,10 +171,11 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
                 int returnval = dialogue.showOpenDialog(null);
                 if (returnval == JFileChooser.APPROVE_OPTION){
                     CompImage comp = new CompImage(dialogue.getSelectedFile());
-                    inputImage = comp.getDisplayedImage();
-                    ouputImage = comp.getDisplayedImage();
+                    inputImage.setImage(comp.getDisplayedImage().getBuffer());
+                    ouputImage.setImage(comp.getDisplayedImage().getBuffer());
                     input.add(inputImage);
                     output.add(ouputImage);
+                    input.repaint();
                 }
             }
         });

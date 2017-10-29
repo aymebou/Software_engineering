@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CompImage {
@@ -71,9 +72,9 @@ public class CompImage {
 
 
     private void buildData(){
-        for (int x = 0 ; x < displayedImage.getWidth() ; x++){
+        for (int x = 0 ; x < displayedImage.getBuffer().getWidth() ; x++){
             int[] pix = new int[3];
-            for (int y = 0 ; y < displayedImage.getHeight() ; y++){
+            for (int y = 0 ; y < displayedImage.getBuffer().getHeight() ; y++){
                 Color color = new Color(displayedImage.getBuffer().getRGB(x, y));
                 pix[0] = color.getRed();
                 pix[1] = color.getGreen();
@@ -90,7 +91,7 @@ public class CompImage {
 
     private int getIndex(int[] pix){
         for (int i = 0 ; i < displayedImage.getPalette().length ; i++){
-            if (pix == displayedImage.getPalette()[i]){
+            if (Arrays.equals(pix, displayedImage.getPalette()[i])){
                 return i;
             }
         }
@@ -108,7 +109,7 @@ public class CompImage {
 
     public static byte[] intToTwoBytes(int n) {
         int n0 = n & 0xFF;
-        int n1 = (n >> 4) & 0xFF;
+        int n1 = (n >> 8) & 0xFF;
         byte b0 = (byte)(n0 - 128);
         byte b1 = (byte)(n1 - 128);
         return new byte[] {b0, b1};
@@ -124,17 +125,17 @@ public class CompImage {
 
         this.buildData();
 
-        byte[] toWrite = new byte[2 + 2 + 1 + 3*displayedImage.getPalette().length + displayedImage.getWidth()*displayedImage.getHeight() ];
+        byte[] toWrite = new byte[2 + 2 + 1 + 3*displayedImage.getPalette().length + displayedImage.getBuffer().getWidth()*displayedImage.getBuffer().getHeight() ];
 
         int offset = 0;
 
-        byte[] height = intToTwoBytes(displayedImage.getHeight());
+        byte[] height = intToTwoBytes(displayedImage.getBuffer().getHeight());
         for (int i = 0 ; i < 2 ; i++){
             toWrite[offset+i] = height[i];
         }
         offset += 2;
 
-        byte[] width = intToTwoBytes(displayedImage.getWidth());
+        byte[] width = intToTwoBytes(displayedImage.getBuffer().getWidth());
         for (int i = 0 ; i < 2 ; i++){
             toWrite[offset+i] = width[i];
         }
@@ -150,14 +151,14 @@ public class CompImage {
         }
         offset += 3*displayedImage.getPalette().length;
 
-        for (int x = 0 ; x < displayedImage.getWidth() ; x++){
-            for (int y = 0 ; y < displayedImage.getHeight() ; y++){
+        for (int x = 0 ; x < displayedImage.getBuffer().getWidth() ; x++){
+            for (int y = 0 ; y < displayedImage.getBuffer().getHeight() ; y++){
                 int[] pix = displayedImage.getRGB(x, y);
                 int index = getIndex(pix);
-                toWrite[offset + x*displayedImage.getHeight() + y] = intToByte(index);
+                toWrite[offset + x*displayedImage.getBuffer().getHeight() + y] = intToByte(index);
             }
         }
-        offset += displayedImage.getHeight()*displayedImage.getWidth();
+        offset += displayedImage.getBuffer().getHeight()*displayedImage.getBuffer().getWidth();
 
         try {
             FileOutputStream output = new FileOutputStream(file.getPath());
