@@ -4,6 +4,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.jfree.ui.RefineryUtilities;
 
 import javax.swing.JButton;
@@ -41,6 +42,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenuItem itemOpen = new JMenuItem("Open");			//Crée une nouvelle option "Open"
 	private JMenuItem itemSave = new JMenuItem("Save");			//Crée une nouvelle option "Save"
 	private JMenuItem itemClose = new JMenuItem("Close");
+	private JMenuItem itemOpenComp = new JMenuItem("Open compressed");
+	private JMenuItem itemSaveComp = new JMenuItem("Save compressed");
 
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
@@ -142,8 +145,40 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		});
 		this.fileMenu.add(itemClose);
 
-		
-		
+		this.fileMenu.addSeparator();
+		itemSaveComp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				JFileChooser dialogue = new JFileChooser();
+				int returnval = dialogue.showSaveDialog(null);
+				if (returnval == JFileChooser.APPROVE_OPTION){
+					try {
+						Files.createFile(dialogue.getSelectedFile().toPath());
+						CompImage toSave = new CompImage(ouputImage);
+						toSave.save(dialogue.getSelectedFile());
+					} catch(IOException e) {}
+				}
+			}
+		});
+		this.fileMenu.add(itemSaveComp);
+
+		this.fileMenu.addSeparator();
+		itemOpenComp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser dialogue = new JFileChooser();
+                int returnval = dialogue.showOpenDialog(null);
+                if (returnval == JFileChooser.APPROVE_OPTION){
+                    CompImage comp = new CompImage(dialogue.getSelectedFile());
+                    inputImage = comp.getDisplayedImage();
+                    ouputImage = comp.getDisplayedImage();
+                    input.add(inputImage);
+                    output.add(ouputImage);
+                }
+            }
+        });
+		this.fileMenu.add(itemOpenComp);
+
 		
 
 		this.menuBar.add(fileMenu);
@@ -189,10 +224,13 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	        KDTree colorsTree = new KDTree();
 	        colorsTree.buildNLayersFromArray(pixels, 4);      //stocke certains les pixels dans le KDTree
             int[][] palette = colorsTree.buildPalette(4);  //construit une palette de 2^powOf2 couleurs (
-            paletteDisp.createPalette(palette);
+
+            paletteDisp.drawPalette(palette);
 			paletteDisp.repaint();
+
             ouputImage.compress(palette, pixels);
             ouputImage.repaint();
+
         }
     }
 	

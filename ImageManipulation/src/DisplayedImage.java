@@ -11,9 +11,10 @@ import static java.lang.Math.pow;
 public class DisplayedImage extends JPanel {
 	
     private BufferedImage image;
-    
-    public DisplayedImage() {
-    }
+    private int[][] palette; //Si l'image est issue d'une compression, contient la palette
+
+    public DisplayedImage(){ }
+
     
     public DisplayedImage(int x, int y, int type) {
     		image = new BufferedImage(x, y, type);
@@ -35,7 +36,11 @@ public class DisplayedImage extends JPanel {
     		
     public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
     		return this.image;
-    	} 
+    	}
+
+    public int[][] getPalette(){
+        return palette;
+    }
     	
     public void inversion() {
         int w = this.image.getWidth();
@@ -83,6 +88,15 @@ public class DisplayedImage extends JPanel {
         }
         return res;
     }
+
+    public int[] getRGB(int x, int y){
+        int res[] = new int[3];
+        Color color = new Color(this.image.getRGB(x, y));
+        res[0] = color.getRed();
+        res[1] = color.getGreen();
+        res[1] = color.getBlue();
+        return res;
+    }
     
 
 
@@ -120,6 +134,7 @@ public class DisplayedImage extends JPanel {
 
     /* Construit l'image compressée en appelant setBestColor pour chaque pixel */
     public void compress(int[][] palette, int[][] pixels){
+        this.palette = palette;
         int height = this.image.getHeight();
         int width = this.image.getWidth();
         for (int y = 0 ; y < height ; y++){
@@ -129,8 +144,8 @@ public class DisplayedImage extends JPanel {
         }
     }
 
-    public void createPalette(int[][] palette) {
-    		
+
+    public void drawPalette(int[][] palette) {
     		for(int i = 0; i < 16; i++) {
     			for(int j = 0; j < 20; j++) {
     				for(int k = 0; k < 20; k++) {
