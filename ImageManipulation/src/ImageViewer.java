@@ -4,7 +4,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.jfree.ui.RefineryUtilities;
 
 import javax.swing.JButton;
@@ -145,6 +144,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		});
 		this.fileMenu.add(itemClose);
 
+		/* Définition de la fonction Save compressed */
 		this.fileMenu.addSeparator();
 		itemSaveComp.addActionListener(new ActionListener() {
 			@Override
@@ -163,6 +163,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		});
 		this.fileMenu.add(itemSaveComp);
 
+		/* Définition de la fonction Open compressed */
 		this.fileMenu.addSeparator();
 		itemOpenComp.addActionListener(new ActionListener() {
             @Override
