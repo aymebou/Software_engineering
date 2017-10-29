@@ -8,24 +8,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 
 
 public class CompressedImage {
-	//Définition d'une image compressée : fichier non propriétaire, écrit en binaire
-	/* On code sur 2 octets la hauteur d'abord puis sur 2 octets également la largeur
+	//Dï¿½finition d'une image compressï¿½e : fichier non propriï¿½taire, ï¿½crit en binaire
+	/* On code sur 2 octets la hauteur d'abord puis sur 2 octets ï¿½galement la largeur
 	 * Vient aussi la taille de la palette, sur 2 octets.
-	 * En soi, il faudrait rester cohérent et stocker la taille de la palette sur 1 octet, comme 
-	 * les positions sont stockées sur 1 octet mais bon...
+	 * En soi, il faudrait rester cohï¿½rent et stocker la taille de la palette sur 1 octet, comme 
+	 * les positions sont stockï¿½es sur 1 octet mais bon...
 	 * 
-	 * On code ensuite la palette en RGB : celle-ci dispose de 8 couleurs dans notre cas donc 
-	 * celle ci sera codée sur 8*3*2 octet (afin que les RGB puissent aller jusqu'à 256 bit chacun) 
-	 * Enfin, le liste des pixels dans depuis le coin haut gauche jusqu'au coin bas droite, en ligne
+	 * On code ensuite la palette en RGB : celle-ci dispose de 8 (16?) couleurs dans notre cas donc 
+	 * celle ci sera codï¿½e sur 8*3*2 octet (afin que les RGB puissent aller jusqu'ï¿½ 256 bit chacun) 
+	 * Enfin, le liste des pixels dans l'ordre depuis le coin haut gauche jusqu'au coin bas droite, en ligne
 	 * 
 	 *  ATTENTION : on ne note pas les couleurs des pixels mais bien les positions (indices) dans la palette
-	 *  chacun codé sur 1 octet
+	 *  chacun codï¿½ sur 1 octet
 	 * 
 	 * EXTENSION DE FICHIER : .comp
 	 * */
@@ -38,39 +39,27 @@ public class CompressedImage {
 	private byte [] pixelList;
 	
 
-	//initialisation à partir des données classiques
-	public void CompressedImage (int h_int, int w_int,int paletteSize_int, 
-									int [][] palette_int, int [] pixelList_int ) {
+	public CompressedImage() {
+	}
+	
+	//initialisation ï¿½ partir des donnï¿½es classiques
+	public void initCompressedImage (int h_int, int w_int,int paletteSize_int, int [][] palette_int, int [] pixelList_int ) {
 		
 		//h, w et paletteSize :
 		h = intToTwoOctet(h_int);
 		w = intToTwoOctet(w_int);
 		paletteSize = intToTwoOctet(paletteSize_int);
-		
 		//Palette ::
 		palette = new byte [paletteSize_int * 6];
-		for (int i=0;i<palette.length;i=i+2) {
-		byte [] toWrite;
-		if (i%3 ==2) {
-			toWrite = intToTwoOctet(palette_int[ i/ paletteSize_int][1]); 
+		for (int i = 0; i < paletteSize_int; i ++) {
+			for(int j = 0; j < 3; j++) {
+				byte[] toWrite;
+				toWrite = intToTwoOctet(palette_int[i][j]);
+				palette[i*6 + j*2 ] = toWrite[0];
+				palette[i*6 + j*2 + 1] = toWrite[1];
+			}
 		}
-		else if (i%3 ==1) {
-			toWrite = intToTwoOctet(palette_int[ i/ paletteSize_int][2]); 
-
-		}
-		else {
-			toWrite = intToTwoOctet(palette_int[ i/ paletteSize_int][i%3]); 
-
-		}
-		/*
-		 * ATTENTION : En implémentant comme ça, on code sur les bits en R--B--G donc pas dans le bon ordre !!
-		 * On inverse donc le cas i%3 = 1 et i%3 = 2
-		 */ 
-		palette[i] = toWrite[0];
-		palette[i+1] = toWrite[1];
-		}
-		
-		// pixelList :: tout est codé sur 1 octet
+		// pixelList :: tout est codï¿½ sur 1 octet
 		pixelList = new byte [pixelList_int.length];
 		for (int i=0;i < pixelList.length;i++) {
 			pixelList[i] = intToOctet(pixelList_int[i]);
@@ -78,7 +67,7 @@ public class CompressedImage {
 	}
 
 	
-	//Fonction auxiliaires de conversion en bits, très pratique
+	//Fonction auxiliaires de conversion en bits, trï¿½s pratique
 	static byte [] intToTwoOctet(int n) {
 		byte byte1 = (byte) (n & 0x7F);
 		byte byte2 = (byte) ((n >> 7) & 0x7F);
@@ -86,20 +75,20 @@ public class CompressedImage {
 		return table;
 	}
 	private byte intToOctet(int n) {
-		assert (n<128); // juste pour vérifier que tout va bien 
+		assert (n<128); // juste pour vï¿½rifier que tout va bien 
 		byte result = (byte) n;
 		return result;
 	}
 	
 	
-	public void saveOnFile() {
+	public void saveOnFile(Path path) {
 		
-		// On crée les données (on les met à la suite)
+		// On crï¿½e les donnï¿½es (on les met ï¿½ la suite)
 		byte [] rawBinData = new byte [h.length + w.length + 
 		                               paletteSize.length + palette.length + pixelList.length ];
 		
-		//Pour plus de simplicité, on les met tous à la suite et on crée une variable offset pour
-		//garder la position du i et bien tout écrire.
+		//Pour plus de simplicitï¿½, on les met tous ï¿½ la suite et on crï¿½e une variable offset pour
+		//garder la position du i et bien tout ï¿½crire.
 		
 		int offset =0;
 		//h
@@ -127,12 +116,13 @@ public class CompressedImage {
 			rawBinData[i+offset] = pixelList[i];
 		}
 		
-		// Ensuite, on écrit le flux d'octets "raw" dans un fichier
+		// Ensuite, on ï¿½crit le flux d'octets "raw" dans un fichier
 		
 	    try {
 		    OutputStream output = null;
 			try {
-		        output = new BufferedOutputStream(new FileOutputStream("out.comp"));
+				output = new BufferedOutputStream(new FileOutputStream(new File(path + ".comp")));
+		        //output = new BufferedOutputStream(new FileOutputStream("out.comp"));
 		        output.write(rawBinData);
 		      }
 			finally {
@@ -148,8 +138,8 @@ public class CompressedImage {
 	}
 	
 	private int byteTwoToInt(byte [] table) {
-		//Fonction bien spécifique au cas présent, données bin codées sur 2 octets
-		int result = (int) table [0] + (int) (table[1] *128);
+		//Fonction bien spï¿½cifique au cas prï¿½sent, donnï¿½es bin codï¿½es sur 2 octet
+		int result = (int) table [0] + (int) table[1]*128;
 		return result;
 	}
 	
@@ -158,24 +148,23 @@ public class CompressedImage {
 		h = new byte [2];
 		w = new byte [2];
 		paletteSize = new byte [2];
-		byte [] palette;
-		byte [] pixelList;
+		/*byte [] palette;
+		byte [] pixelList;*/
 		
 	    try {
 			input = new FileInputStream(fileName);
 			//Maintenant, stockons
-			// Le read fonctionne comme en C, on a un pointeur qui se souvient de l'endroit où on est.
+			// Le read fonctionne comme en C, on a un pointeur qui se souvient de l'endroit oï¿½ on est.
 		    input.read(h);
 		    input.read(w);
 		    int h_int = byteTwoToInt(h);
 		    int w_int = byteTwoToInt(w);
 		    input.read(paletteSize);
 		    int paletteSize_int = byteTwoToInt(paletteSize);
-		    palette = new 	byte [paletteSize_int * 6];
+		    palette = new byte [paletteSize_int * 6];
 		    input.read(palette);
 		    pixelList = new byte [h_int*w_int];
 		    input.read(pixelList); 
-		    		    
 
 		} catch(Exception ex) {
 	        
@@ -189,45 +178,55 @@ public class CompressedImage {
 	      }
 	    
 	}
+	
 	public DisplayedImage compressedImageToDisplayedImage () {
 		DisplayedImage pic = new DisplayedImage(byteTwoToInt(w),byteTwoToInt(h),BufferedImage.TYPE_INT_ARGB);
 		
-		byte [] R_byte = new byte [2]; 
-		byte [] G_byte = new byte [2]; 
-		byte [] B_byte = new byte [2];
-		int x = 0; int y = 0;
-		for (int i= 0; i < byteTwoToInt(w) * byteTwoToInt(h) ;i++ ) {
-			//On définit les R, G et B :
-			
-			/*Dans la palette, tout est codé en byte, sur 2 cases, on prend alors en compte 
-			 *Les deux cases pour chacun.
-			 *
-			 *RAPPEL : dans la palette sont stockée à la suite les RGB des couleurs utilisées
-			 *DONC : une "case RGB" de la palette fait en réalité 6 cases byte
-			*/
-			R_byte = new byte [] { palette[(int) pixelList[6 * i]], 
-										palette[ (int) pixelList[6 * i+1] ]};
-			
-			G_byte = new byte [] { palette[(int) pixelList[6*i + 2]], 
-										palette[ (int) pixelList[6* i + 3] ]};
-				
-			B_byte = new byte [] { palette[(int) pixelList[6 * i + 4]], 
-										palette[ (int) pixelList[6 * i + 5] ]};
-			Color color = new Color(byteTwoToInt(R_byte),byteTwoToInt(G_byte),
-									byteTwoToInt(B_byte));
-			pic.setPixelColor(x, y, color);
-			
-			
-			if (i%byteTwoToInt(w) ==0) {
-				x=0;
-				y++;
-			}
-			else {
-				x++;
+		byte [] R_byte; 
+		byte [] G_byte; 
+		byte [] B_byte;
+		int w_int = byteTwoToInt(w);
+		for (int x = 0; x < w_int ; x++) {
+			for (int y = 0; y <byteTwoToInt(h) ; y++) {
+				R_byte = new byte [] { palette[(int) 6*pixelList[y*w_int + x]], 
+						palette[ (int) 6*pixelList[y*w_int + x] + 1]};
+
+				G_byte = new byte [] { palette[(int) 6*pixelList[y*w_int + x] + 2], 
+						palette[ (int) 6*pixelList[y*w_int + x] + 3]};
+
+				B_byte = new byte [] { palette[(int) 6*pixelList[y*w_int + x] + 4], 
+						palette[ (int) 6*pixelList[y*w_int + x] + 5]};
+				Color color = new Color(byteTwoToInt(R_byte), byteTwoToInt(G_byte), byteTwoToInt(B_byte));
+				pic.setPixelColor(x, y, color);
 			}
 		}
-	return pic;
+		return pic;
 	}
+	
+	public BufferedImage compressedImageToBufferedImage () {
+		DisplayedImage pic = new DisplayedImage(byteTwoToInt(w),byteTwoToInt(h),BufferedImage.TYPE_INT_ARGB);
+		
+		byte [] R_byte; 
+		byte [] G_byte; 
+		byte [] B_byte;
+		int w_int = byteTwoToInt(w);
+		for (int x = 0; x < w_int ; x++) {
+			for (int y = 0; y <byteTwoToInt(h) ; y++) {
+				R_byte = new byte [] { palette[(int) 6*pixelList[y*w_int + x]], 
+						palette[ (int) 6*pixelList[y*w_int + x] + 1]};
+
+				G_byte = new byte [] { palette[(int) 6*pixelList[y*w_int + x] + 2], 
+						palette[ (int) 6*pixelList[y*w_int + x] + 3]};
+
+				B_byte = new byte [] { palette[(int) 6*pixelList[y*w_int + x] + 4], 
+						palette[ (int) 6*pixelList[y*w_int + x] + 5]};
+				Color color = new Color(byteTwoToInt(R_byte), byteTwoToInt(G_byte), byteTwoToInt(B_byte));
+				pic.setPixelColor(x, y, color);
+			}
+		}
+		return pic.getBuffer();
+	}
+		
 	
 	
 	

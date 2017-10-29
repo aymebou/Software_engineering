@@ -24,7 +24,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 {
     /* Création des images */
     private DisplayedImage inputImage = new DisplayedImage();
-	private DisplayedImage ouputImage = new DisplayedImage();
+    private DisplayedImage ouputImage = new DisplayedImage();
+	private CompressedImage ouputImageComp = new CompressedImage();
 	
 	/*Création de l'affichage palette */
 	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
@@ -38,8 +39,12 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
     /* Création du menu déroulant File */
 	private JMenuBar menuBar = new JMenuBar();
 	private JMenu fileMenu = new JMenu("File");
+	private JMenu imageMenu = new JMenu("Image");
+	private JMenu compMenu = new JMenu("Compressed image");
 	private JMenuItem itemOpen = new JMenuItem("Open");			//Crée une nouvelle option "Open"
 	private JMenuItem itemSave = new JMenuItem("Save");			//Crée une nouvelle option "Save"
+	private JMenuItem itemOpenComp = new JMenuItem("Open");			//Crée une nouvelle option "Open"
+	private JMenuItem itemSaveComp = new JMenuItem("Save");			//Crée une nouvelle option "Save"
 	private JMenuItem itemClose = new JMenuItem("Close");
 
 	public ImageViewer () {
@@ -53,7 +58,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		input.add(inputImage);
 
 		JPanel action = new JPanel();
-		action.setLayout(new GridLayout(4,1));// BoxLayout(action, BoxLayout.PAGE_AXIS));
+		action.setLayout(new GridLayout(4,1));
 		action.setMaximumSize(new Dimension(80, 400));
 		action.add(buttonAction);
 		// Defines action associated to buttons
@@ -71,7 +76,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		output.add(ouputImage); 		
 		
 		JPanel paletteG = new JPanel();
-		paletteG.setLayout(new BoxLayout(paletteG, BoxLayout.PAGE_AXIS)); //new BorderLayout());
+		paletteG.setLayout(new BoxLayout(paletteG, BoxLayout.PAGE_AXIS)); 
 		paletteG.setMinimumSize(new Dimension(40, 400));
 		paletteG.add(paletteDisp);
 		
@@ -107,10 +112,9 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		        }
 			}
 		});
-		this.fileMenu.add(itemOpen);
+		this.imageMenu.add(itemOpen);
 
 		/* Définition de la fonction Save */
-		this.fileMenu.addSeparator();
 		itemSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				{
@@ -131,27 +135,77 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 				}
 			}
 		});
-		this.fileMenu.add(itemSave);
+		this.imageMenu.add(itemSave);
 
 		/* Définiton de la fonction Close */
-		this.fileMenu.addSeparator();
 		itemClose.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
 			}        
 		});
+		
+		itemOpenComp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				{
+		            // création de la boîte de dialogue
+		            JFileChooser dialogue = new JFileChooser();
+		             
+		            // affichage
+		            int returnVal = dialogue.showOpenDialog(null);
+		             
+		            // récupération du fichier sélectionné
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    		CompressedImage inputImageComp = new CompressedImage();
+                    		try {
+								inputImageComp.openFromFile(dialogue.getSelectedFile().toString());
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+                        inputImage.InitFromBuffer(inputImageComp.compressedImageToBufferedImage());
+                        input.add(inputImage);    
+                        ouputImage.InitFromBuffer(inputImageComp.compressedImageToBufferedImage());
+                        output.add(ouputImage);	//Ajoute l'image choisie
+                        input.repaint();            //Refresh l'image
+                    }
+		        }
+			}
+		});
+		this.compMenu.add(itemOpenComp);
+
+		
+		itemSaveComp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				{
+		            // création de la boîte de dialogue
+		            JFileChooser dialogue = new JFileChooser();
+		             
+		            // affichage
+		            int returnVal = dialogue.showSaveDialog(null);
+
+		            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        try {
+                        		Files.createFile(dialogue.getSelectedFile().toPath());
+                        		ouputImageComp.saveOnFile(dialogue.getSelectedFile().toPath());
+                            //ImageIO.write(ouputImage.getBuffer(), "png", dialogue.getSelectedFile());        //Save as TextEdit file, why ?
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+				}
+			}
+		});
+		this.compMenu.add(itemSaveComp);
+		
+		this.fileMenu.add(imageMenu);
+		this.fileMenu.add(compMenu);
+		this.fileMenu.addSeparator();
 		this.fileMenu.add(itemClose);
 
 		
-		
-		
-
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 
 		this.setVisible(true);
-		
-		
 	}
 
 	/**
@@ -174,7 +228,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	class Histogramme implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			int[] pixels = inputImage.getColor();
-			BarChartInt chart = new BarChartInt("Tré bo barChart", 
+			BarChartInt chart = new BarChartInt("BarChart", 
 			         "Répartition des couleurs", pixels);
 			chart.pack( );        
 			RefineryUtilities.centerFrameOnScreen( chart );        
@@ -193,6 +247,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 			paletteDisp.repaint();
             ouputImage.compress(palette, pixels);
             ouputImage.repaint();
+            ouputImageComp = ouputImage.displayedImageToCompressedImage(palette, pixels);
         }
     }
 	
