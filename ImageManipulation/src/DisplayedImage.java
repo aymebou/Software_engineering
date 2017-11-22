@@ -16,7 +16,7 @@ public class DisplayedImage extends JPanel {
     /**
      * Construit une DisplayedImage vide.
      */
-    public DisplayedImage(){ }
+    DisplayedImage(){ }
 
     /**
      * Construit une DispalyedImzge contenant une BufferedImage du type demandé, de largeur x et de hauteur y.
@@ -24,7 +24,7 @@ public class DisplayedImage extends JPanel {
      * @param y : hauteur de l'image.
      * @param type : type de l'image à stocker.
      */
-    public DisplayedImage(int x, int y, int type) {
+    DisplayedImage(int x, int y, int type) {
     		image = new BufferedImage(x, y, type);
     }
 
@@ -34,7 +34,7 @@ public class DisplayedImage extends JPanel {
      * @param y : ordonnée du pixel.
      * @param color : color à attribuer au pixel.
      */
-    public void setPixelColor(int x, int y, Color color) {
+    void setPixelColor(int x, int y, Color color) {
     	int rgb = color.getRGB();
     	image.setRGB(x, y, rgb);
     }
@@ -44,7 +44,7 @@ public class DisplayedImage extends JPanel {
      * Ouvre un fichier image et stocke l'image dans la DisplayedImage.
      * @param imageName : nom du fichier image à ouvrir.
      */
-    public void setImage(File imageName) {			//Modifie l'image.
+    void setImage(File imageName) {			//Modifie l'image.
         try {
             image = ImageIO.read(imageName);
         } catch (IOException e) {
@@ -57,7 +57,7 @@ public class DisplayedImage extends JPanel {
      * Attribue une BufferedImageà la DisplayedImage.
      * @param image : la BufferedImage à attribuer à la DisplayedImage.
      */
-    public void setImage(BufferedImage image){
+    void setImage(BufferedImage image){
         this.image = image;
     }
 
@@ -66,7 +66,7 @@ public class DisplayedImage extends JPanel {
      * Retourne la BufferedImage stockée dans la DisplayedImage
      * @return : la BufferedImage stockée dans la DisplayedImage.
      */
-    public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
+    BufferedImage getBuffer() {				//Renvoie le buffer de l'image
     		return this.image;
     	}
 
@@ -76,7 +76,7 @@ public class DisplayedImage extends JPanel {
      * @return la palette de la DisplayedImage. C'est un tableau vide si la DisplayedImage n'est pas issue d'une
      * compression.
      */
-    public int[][] getPalette(){
+    int[][] getPalette(){
         return palette;
     }
 
@@ -84,7 +84,7 @@ public class DisplayedImage extends JPanel {
     /**
      * Transforme la DisplayedImage en son négatif.
      */
-    public void inversion() {
+    void inversion() {
         int w = this.image.getWidth();
         int h = this.image.getHeight();
 
@@ -101,7 +101,7 @@ public class DisplayedImage extends JPanel {
     }
 
 
-    public int[] getColor() {
+    int[] getColor() {
         int[] res = {0, 0, 0};
         int w = this.image.getWidth();
         int h = this.image.getHeight();
@@ -130,7 +130,7 @@ public class DisplayedImage extends JPanel {
      * @param y : ordonnée du pixel.
      * @return un tableau de 3 entiers contenant les composantes RGB du pixel.
      */
-    public int[] getRGB(int x, int y){
+    int[] getRGB(int x, int y){
         int res[] = new int[3];
         Color color = new Color(this.image.getRGB(x, y));
         res[0] = color.getRed();
@@ -144,7 +144,7 @@ public class DisplayedImage extends JPanel {
      * Retourne un tableau des composantes RGB de chacun des pixels de la DisplayedImage.
      * @return un tableau de tableaux contenant les composantes RGB de tous les pixels.
      */
-    public int[][] buildPixelArray() {
+    int[][] buildPixelArray() {
         int height = this.image.getHeight();
         int width = this.image.getWidth();
         int[][] pixels = new int[height * width][3];
@@ -166,7 +166,7 @@ public class DisplayedImage extends JPanel {
      * @param y : l'ordonnée du pixel à modifier.
      * @param pixel : le pixel de référence.
      */
-    public void setBestColor(int x, int y, int[] pixel){
+    private void setBestColor(int x, int y, int[] pixel){
         Color color = new Color(palette[0][0], palette[0][1], palette[0][2]);
         int min = (int)pow((pixel[0] - palette[0][0]), 2) + (int)pow((pixel[1] - palette[0][1]), 2) + (int)pow((pixel[2] - palette[0][2]), 2);
         for (int k = 1 ; k < palette.length ; k++){
@@ -182,10 +182,11 @@ public class DisplayedImage extends JPanel {
 
     /**
      * Construit une image compressée en remplaçant chaque pixel de l'image par le pixel de la palette le plus proche.
-     * @param palette
-     * @param pixels
+     * Stocke la palette passée en paramètre dans le paramètre palette de la DisplayedImage.
+     * @param palette : la palette utilisée.
+     * @param pixels : le tableau de pixels
      */
-    public void compress(int[][] palette, int[][] pixels){
+    void compress(int[][] palette, int[][] pixels){
         this.palette = palette;
         int height = this.image.getHeight();
         int width = this.image.getWidth();
@@ -197,7 +198,7 @@ public class DisplayedImage extends JPanel {
     }
 
 
-    public void drawPalette(int[][] palette) {
+    void drawPalette(int[][] palette) {
     		for(int i = 0; i < 16; i++) {
     			for(int j = 0; j < 20; j++) {
     				for(int k = 0; k < 20; k++) {

@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CompImage {
+class CompImage {
 
     /* Une CompImage contient une DisplayedImage (qui contient elle-meme la palette) et de la liste des indices
        des pixels dans la palette. */
     private DisplayedImage displayedImage;
     private List<Integer> pixels = new ArrayList<>();
 
-    public CompImage(DisplayedImage image){
+    CompImage(DisplayedImage image){
         displayedImage = image;
     }
 
     /* Créer une CompImage à partir d'un fichier, pour pouvoir ouvrir un fichier d'image compressée. */
-    public CompImage(File file){
+    CompImage(File file){
         int height;
         int width;
         int paletteSize;
@@ -64,15 +64,19 @@ public class CompImage {
                         displayedImage.setPixelColor(x, y, new Color(palette[index][0], palette[index][1], palette[index][2]));
                     }
                 }
-            } catch(IOException e){}
-        } catch(FileNotFoundException e){}
+            } catch(IOException e){
+                System.out.println("Erreur de lecture du fichier !");
+            }
+        } catch(FileNotFoundException e){
+            System.out.println("Fichier introuvable !");
+        }
 
 
 
     }
 
 
-    public DisplayedImage getDisplayedImage() {
+    DisplayedImage getDisplayedImage() {
         return displayedImage;
     }
 
@@ -106,16 +110,16 @@ public class CompImage {
     }
 
     /* Fonctions de conversion d'entiers en octets et inversement */
-    public static byte intToByte(int n){
+    private static byte intToByte(int n){
         n &= 0xFF;
         return (byte)(n - 128);
     }
 
-    public static int byteToInt(byte b){
+    private static int byteToInt(byte b){
         return (int)b + 128;
     }
 
-    public static byte[] intToTwoBytes(int n) {
+    private static byte[] intToTwoBytes(int n) {
         int n0 = n & 0xFF;
         int n1 = (n >> 8) & 0xFF;
         byte b0 = (byte)(n0 - 128);
@@ -123,14 +127,14 @@ public class CompImage {
         return new byte[] {b0, b1};
     }
 
-    public static int twoBytesToInt(byte[] b){
+    private static int twoBytesToInt(byte[] b){
         int n0 = (int)b[0] + 128;
         int n1 = ((int)b[1] + 128) << 8;
         return n0 + n1;
     }
 
     /* Enregistre la CompImage dans le fichier file */
-    public void save(File file){
+    void save(File file){
 
         /* On commence par construire la liste des indices des pixels dans la palette */
         this.buildData();
@@ -187,8 +191,12 @@ public class CompImage {
             FileOutputStream output = new FileOutputStream(file.getPath());
             try {
                 output.write(toWrite);
-            } catch(IOException e){ }
-        } catch(FileNotFoundException e){}
+            } catch(IOException e){
+                System.out.println("Erreur d'écriture dans le fichier !");
+            }
+        } catch(FileNotFoundException e){
+            System.out.println("Erreur de création ou d'ouverture du fichier !");
+        }
     }
 
 

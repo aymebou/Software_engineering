@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 
-public class ImageViewer extends JFrame /*implements ActionListener*/
+class ImageViewer extends JFrame /*implements ActionListener*/
 {
     /* Création des images */
     private DisplayedImage inputImage = new DisplayedImage();
@@ -28,7 +28,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	
 	/*Création de l'affichage palette */
 	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
-	
+
 	/* Création des boutons d'actions */
 	private JButton buttonAction = new JButton("Action");
 	private JButton buttonInversion = new JButton("Inversion"); 	//Crée un nouveau bouton "Inversion"
@@ -44,7 +44,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenuItem itemOpenComp = new JMenuItem("Open compressed");
 	private JMenuItem itemSaveComp = new JMenuItem("Save compressed");
 
-	public ImageViewer () {
+	ImageViewer() {
 		this.setTitle("Image Viewer");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(1000, 400);
@@ -94,10 +94,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 				{
 		            // création de la boîte de dialogue
 		            JFileChooser dialogue = new JFileChooser();
-		             
+
 		            // affichage
 		            int returnVal = dialogue.showOpenDialog(null);
-		             
+
 		            // récupération du fichier sélectionné
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         inputImage.setImage(dialogue.getSelectedFile());

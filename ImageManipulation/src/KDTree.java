@@ -36,7 +36,7 @@ public class KDTree {
     /**
      * Construit un KDTree vide.
      */
-    public KDTree() {
+    KDTree() {
         tete = null;
         filsG = null;
         filsD = null;
@@ -131,7 +131,7 @@ public class KDTree {
      * @param array : tableau de pixels. Un pixel est un tableau de 3 entiers RGB.
      * @param n : le nombre de couches à construire.
      */
-    public void buildNLayersFromArray(int[][] array, int n) {this.buildNLayersFromNodes(buildNodeList(array), n, 0);}
+    void buildNLayersFromArray(int[][] array, int n) {this.buildNLayersFromNodes(buildNodeList(array), n, 0);}
 
     private int[] moyenne(){
         int[] moy = new int[dimension];
@@ -203,10 +203,10 @@ public class KDTree {
 
     /**
      * Construit une palette de 2^powOf2 couleurs représentatives des couleurs stockées dans le KDTree.
-     * @param powOf2
+     * @param powOf2 :
      * @return palette : un tableau de 2^powOf2 pixels.
      */
-    public int[][] buildPalette(int powOf2) {
+    int[][] buildPalette(int powOf2) {
         int[][] palette = new int[(int)pow(2, powOf2)][dimension];
         ArrayList<KDTree> layer = this.getLayer(powOf2);
         for (int i = 0 ; i < layer.size() ; i++) {
