@@ -51,6 +51,8 @@ public class KDTree {
     }
 
     //Construit un KDTree a partir d'une liste de noeuds representant des pixels
+    //La variable compteur sert à retenir dans à quelle dimension doit être normal le nouvel hyperplan.
+    //compteur = 0 quand on appelle la fonction, la variable sera modifiée au cours des appels récursifs.
     private void buildFromNodes(List<Node> list, int compteur) {
 
         if (list.size() == 0) {

@@ -25,7 +25,6 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
     /* Création des images */
     private DisplayedImage inputImage = new DisplayedImage();
     private DisplayedImage ouputImage = new DisplayedImage();
-	private CompressedImage ouputImageComp = new CompressedImage();
 	
 	/*Création de l'affichage palette */
 	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
@@ -43,9 +42,9 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenu compMenu = new JMenu("Compressed image");
 	private JMenuItem itemOpen = new JMenuItem("Open");			//Crée une nouvelle option "Open"
 	private JMenuItem itemSave = new JMenuItem("Save");			//Crée une nouvelle option "Save"
-	private JMenuItem itemOpenComp = new JMenuItem("Open");			//Crée une nouvelle option "Open"
-	private JMenuItem itemSaveComp = new JMenuItem("Save");			//Crée une nouvelle option "Save"
 	private JMenuItem itemClose = new JMenuItem("Close");
+	private JMenuItem itemOpenComp = new JMenuItem("Open compressed");
+	private JMenuItem itemSaveComp = new JMenuItem("Save compressed");
 
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
@@ -143,58 +142,46 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 				System.exit(0);
 			}        
 		});
-		
-		itemOpenComp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				{
-		            // création de la boîte de dialogue
-		            JFileChooser dialogue = new JFileChooser();
-		             
-		            // affichage
-		            int returnVal = dialogue.showOpenDialog(null);
-		             
-		            // récupération du fichier sélectionné
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    		CompressedImage inputImageComp = new CompressedImage();
-                    		try {
-								inputImageComp.openFromFile(dialogue.getSelectedFile().toString());
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-                        inputImage.InitFromBuffer(inputImageComp.compressedImageToBufferedImage());
-                        input.add(inputImage);    
-                        ouputImage.InitFromBuffer(inputImageComp.compressedImageToBufferedImage());
-                        output.add(ouputImage);	//Ajoute l'image choisie
-                        input.repaint();            //Refresh l'image
-                    }
-		        }
-			}
-		});
-		this.compMenu.add(itemOpenComp);
 
-		
+		this.fileMenu.add(itemClose);
+
+		/* Définition de la fonction Save compressed */
+		this.fileMenu.addSeparator();
 		itemSaveComp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				{
-		            // création de la boîte de dialogue
-		            JFileChooser dialogue = new JFileChooser();
-		             
-		            // affichage
-		            int returnVal = dialogue.showSaveDialog(null);
-
-		            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        try {
-                        		Files.createFile(dialogue.getSelectedFile().toPath());
-                        		ouputImageComp.saveOnFile(dialogue.getSelectedFile().toPath());
-                            //ImageIO.write(ouputImage.getBuffer(), "png", dialogue.getSelectedFile());        //Save as TextEdit file, why ?
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				JFileChooser dialogue = new JFileChooser();
+				int returnval = dialogue.showSaveDialog(null);
+				if (returnval == JFileChooser.APPROVE_OPTION){
+					try {
+					    if (!dialogue.getSelectedFile().exists())
+						    Files.createFile(dialogue.getSelectedFile().toPath());
+						CompImage toSave = new CompImage(ouputImage);
+						toSave.save(dialogue.getSelectedFile());
+					} catch(IOException e) {}
 				}
 			}
 		});
-		this.compMenu.add(itemSaveComp);
+		this.fileMenu.add(itemSaveComp);
+
+		/* Définition de la fonction Open compressed */
+		this.fileMenu.addSeparator();
+		itemOpenComp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser dialogue = new JFileChooser();
+                int returnval = dialogue.showOpenDialog(null);
+                if (returnval == JFileChooser.APPROVE_OPTION){
+                    CompImage comp = new CompImage(dialogue.getSelectedFile());
+                    inputImage.setImage(comp.getDisplayedImage().getBuffer());
+                    ouputImage.setImage(comp.getDisplayedImage().getBuffer());
+                    input.add(inputImage);
+                    output.add(ouputImage);
+                    input.repaint();
+                }
+            }
+        });
+		this.fileMenu.add(itemOpenComp);
 		
 		this.fileMenu.add(imageMenu);
 		this.fileMenu.add(compMenu);
@@ -243,11 +230,13 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	        KDTree colorsTree = new KDTree();
 	        colorsTree.buildNLayersFromArray(pixels, 4);      //stocke certains les pixels dans le KDTree
             int[][] palette = colorsTree.buildPalette(4);  //construit une palette de 2^powOf2 couleurs (
-            paletteDisp.createPalette(palette);
+
+            paletteDisp.drawPalette(palette);
 			paletteDisp.repaint();
+
             ouputImage.compress(palette, pixels);
             ouputImage.repaint();
-            ouputImageComp = ouputImage.displayedImageToCompressedImage(palette, pixels);
+
         }
     }
 	
