@@ -7,11 +7,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset; 
 import org.jfree.data.category.DefaultCategoryDataset; 
 
-public class BarChartInt extends JFrame {
+class BarChartInt extends JFrame {
 	
-		int[] data;
+		private int[] data;
 	
-		   public BarChartInt( String applicationTitle , String chartTitle , int[] data ) {
+		   BarChartInt(String applicationTitle, String chartTitle, int[] data) {
 		      super( applicationTitle );
 		      this.data = data;
 		      JFreeChart barChart = ChartFactory.createBarChart(

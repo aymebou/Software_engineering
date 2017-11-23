@@ -13,23 +13,47 @@ public class DisplayedImage extends JPanel {
     private BufferedImage image;
     private int[][] palette; //Si l'image est issue d'une compression, contient la palette
 
-    public DisplayedImage(){ }
+    /**
+     * Construit une DisplayedImage vide.
+     */
+    DisplayedImage(){ }
 
-    
-    public DisplayedImage(int x, int y, int type) {
+    /**
+     * Construit une DispalyedImzge contenant une BufferedImage du type demandé, de largeur x et de hauteur y.
+     * @param x : largeur de l'image.
+     * @param y : hauteur de l'image.
+     * @param type : type de l'image à stocker.
+     */
+    DisplayedImage(int x, int y, int type) {
     		image = new BufferedImage(x, y, type);
     }
+<<<<<<< HEAD:ImageManipulation/src/DisplayedImage.java
     
     public void InitFromBuffer(BufferedImage buffer) {
     		image = buffer;
     }
     
     public void setPixelColor(int x, int y, Color color) {
+=======
+
+    /**
+     * Attribue une couleur à un pixel de la DisplayedImage.
+     * @param x : abscisse du pixel.
+     * @param y : ordonnée du pixel.
+     * @param color : color à attribuer au pixel.
+     */
+    void setPixelColor(int x, int y, Color color) {
+>>>>>>> master:image-viewer/src/main/java/imageviewer/DisplayedImage.java
     	int rgb = color.getRGB();
     	image.setRGB(x, y, rgb);
     }
-    	
-    public void setImage(File imageName) {			//Modifie l'image.
+
+
+    /**
+     * Ouvre un fichier image et stocke l'image dans la DisplayedImage.
+     * @param imageName : nom du fichier image à ouvrir.
+     */
+    void setImage(File imageName) {			//Modifie l'image.
         try {
             image = ImageIO.read(imageName);
         } catch (IOException e) {
@@ -37,20 +61,39 @@ public class DisplayedImage extends JPanel {
         }
     }    
 
-    public void setImage(BufferedImage image){
+
+    /**
+     * Attribue une BufferedImageà la DisplayedImage.
+     * @param image : la BufferedImage à attribuer à la DisplayedImage.
+     */
+    void setImage(BufferedImage image){
         this.image = image;
     }
-    
-    		
-    public BufferedImage getBuffer() {				//Renvoie le buffer de l'image
+
+
+    /**
+     * Retourne la BufferedImage stockée dans la DisplayedImage
+     * @return : la BufferedImage stockée dans la DisplayedImage.
+     */
+    BufferedImage getBuffer() {				//Renvoie le buffer de l'image
     		return this.image;
     	}
 
-    public int[][] getPalette(){
+
+    /**
+     * Retourne la palette stockée dans la DisplayedImage.
+     * @return la palette de la DisplayedImage. C'est un tableau vide si la DisplayedImage n'est pas issue d'une
+     * compression.
+     */
+    int[][] getPalette(){
         return palette;
     }
-    	
-    public void inversion() {
+
+
+    /**
+     * Transforme la DisplayedImage en son négatif.
+     */
+    void inversion() {
         int w = this.image.getWidth();
         int h = this.image.getHeight();
 
@@ -66,7 +109,8 @@ public class DisplayedImage extends JPanel {
         }
     }
 
-    public int[] getColor() {
+
+    int[] getColor() {
         int[] res = {0, 0, 0};
         int w = this.image.getWidth();
         int h = this.image.getHeight();
@@ -87,8 +131,20 @@ public class DisplayedImage extends JPanel {
         }
         return res;
     }
+<<<<<<< HEAD:ImageManipulation/src/DisplayedImage.java
     
     public int[] getRGB(int x, int y){
+=======
+
+
+    /**
+     * Retourne les composantes RGB d'un pixel de la DisplayedImage.
+     * @param x : abscisse du pixel.
+     * @param y : ordonnée du pixel.
+     * @return un tableau de 3 entiers contenant les composantes RGB du pixel.
+     */
+    int[] getRGB(int x, int y){
+>>>>>>> master:image-viewer/src/main/java/imageviewer/DisplayedImage.java
         int res[] = new int[3];
         Color color = new Color(this.image.getRGB(x, y));
         res[0] = color.getRed();
@@ -96,12 +152,19 @@ public class DisplayedImage extends JPanel {
         res[2] = color.getBlue();
         return res;
     }
-    
 
 
+<<<<<<< HEAD:ImageManipulation/src/DisplayedImage.java
 
     /* Retourne un tableau contenat les 3 composantes RGB de chacun des pixels */
     public int[][] buildPixelArray() {
+=======
+    /**
+     * Retourne un tableau des composantes RGB de chacun des pixels de la DisplayedImage.
+     * @return un tableau de tableaux contenant les composantes RGB de tous les pixels.
+     */
+    int[][] buildPixelArray() {
+>>>>>>> master:image-viewer/src/main/java/imageviewer/DisplayedImage.java
         int height = this.image.getHeight();
         int width = this.image.getWidth();
         int[][] pixels = new int[height * width][3];
@@ -116,9 +179,21 @@ public class DisplayedImage extends JPanel {
         return pixels;
     }
 
+<<<<<<< HEAD:ImageManipulation/src/DisplayedImage.java
     /* Remplace le pixel(x, y) de outputImage par le pixel de la palette le plus adapté */
     public void setBestColor(int x, int y, int[][] palette, int[] pixel){
     		Color color = new Color(palette[0][0], palette[0][1], palette[0][2]);
+=======
+
+    /**
+     * Remplace un pixel de la DisplayedImage par le pixel de la palette le plus proche du pixel passé en paramètre.
+     * @param x : l'abscisse du pixel à modifier.
+     * @param y : l'ordonnée du pixel à modifier.
+     * @param pixel : le pixel de référence.
+     */
+    private void setBestColor(int x, int y, int[] pixel){
+        Color color = new Color(palette[0][0], palette[0][1], palette[0][2]);
+>>>>>>> master:image-viewer/src/main/java/imageviewer/DisplayedImage.java
         int min = (int)pow((pixel[0] - palette[0][0]), 2) + (int)pow((pixel[1] - palette[0][1]), 2) + (int)pow((pixel[2] - palette[0][2]), 2);
         for (int k = 1 ; k < palette.length ; k++){
             int distance = (int)pow((pixel[0] - palette[k][0]), 2) + (int)pow((pixel[1] - palette[k][1]), 2) + (int)pow((pixel[2] - palette[k][2]), 2);
@@ -129,21 +204,33 @@ public class DisplayedImage extends JPanel {
         }
         this.image.setRGB(x, y, color.getRGB());
     }
+<<<<<<< HEAD:ImageManipulation/src/DisplayedImage.java
     
     /* Construit l'image compressée en appelant setBestColor pour chaque pixel */
     public void compress(int[][] palette, int[][] pixels){
+=======
+
+
+    /**
+     * Construit une image compressée en remplaçant chaque pixel de l'image par le pixel de la palette le plus proche.
+     * Stocke la palette passée en paramètre dans le paramètre palette de la DisplayedImage.
+     * @param palette : la palette utilisée.
+     * @param pixels : le tableau de pixels
+     */
+    void compress(int[][] palette, int[][] pixels){
+>>>>>>> master:image-viewer/src/main/java/imageviewer/DisplayedImage.java
         this.palette = palette;
         int height = this.image.getHeight();
         int width = this.image.getWidth();
         for (int y = 0 ; y < height ; y++){
             for (int x = 0 ; x < width ; x++){
-                this.setBestColor(x, y, palette, pixels[y * width + x]);
+                this.setBestColor(x, y, pixels[y * width + x]);
             }
         }
     }
 
 
-    public void drawPalette(int[][] palette) {
+    void drawPalette(int[][] palette) {
     		for(int i = 0; i < 16; i++) {
     			for(int j = 0; j < 20; j++) {
     				for(int k = 0; k < 20; k++) {

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 
-public class ImageViewer extends JFrame /*implements ActionListener*/
+class ImageViewer extends JFrame /*implements ActionListener*/
 {
     /* Création des images */
     private DisplayedImage inputImage = new DisplayedImage();
@@ -28,9 +28,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	
 	/*Création de l'affichage palette */
 	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
-	
+
 	/* Création des boutons d'actions */
-	private JButton buttonAction = new JButton("Action");
 	private JButton buttonInversion = new JButton("Inversion"); 	//Crée un nouveau bouton "Inversion"
 	private JButton buttonHisto = new JButton("Histogramme");		//Crée un nouveau bouton "Histogramme"
     private JButton buttonCompress = new JButton("Compresser");
@@ -46,7 +45,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenuItem itemOpenComp = new JMenuItem("Open compressed");
 	private JMenuItem itemSaveComp = new JMenuItem("Save compressed");
 
-	public ImageViewer () {
+	ImageViewer() {
 		this.setTitle("Image Viewer");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(1000, 400);
@@ -59,9 +58,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		JPanel action = new JPanel();
 		action.setLayout(new GridLayout(4,1));
 		action.setMaximumSize(new Dimension(80, 400));
-		action.add(buttonAction);
 		// Defines action associated to buttons
-		buttonAction.addActionListener(new ButtonListener());
 		action.add(buttonInversion);
 		buttonInversion.addActionListener(new Inversion());
 		action.add(buttonHisto);
@@ -96,10 +93,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 				{
 		            // création de la boîte de dialogue
 		            JFileChooser dialogue = new JFileChooser();
-		             
+
 		            // affichage
 		            int returnVal = dialogue.showOpenDialog(null);
-		             
+
 		            // récupération du fichier sélectionné
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         inputImage.setImage(dialogue.getSelectedFile());
@@ -198,13 +195,6 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	/**
 	 * Class listening to a given button
 	 */
-	class ButtonListener implements ActionListener{
-		public void actionPerformed(ActionEvent arg0) 
-		{
-			System.out.println("Action Performed");
-		}
-	}
-	
 	class Inversion implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			ouputImage.inversion();
