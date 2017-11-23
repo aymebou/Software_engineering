@@ -30,7 +30,6 @@ class ImageViewer extends JFrame /*implements ActionListener*/
 	private DisplayedImage paletteDisp = new DisplayedImage(20, 350, BufferedImage.TYPE_INT_ARGB);
 
 	/* Création des boutons d'actions */
-	private JButton buttonAction = new JButton("Action");
 	private JButton buttonInversion = new JButton("Inversion"); 	//Crée un nouveau bouton "Inversion"
 	private JButton buttonHisto = new JButton("Histogramme");		//Crée un nouveau bouton "Histogramme"
     private JButton buttonCompress = new JButton("Compresser");
@@ -57,9 +56,7 @@ class ImageViewer extends JFrame /*implements ActionListener*/
 		JPanel action = new JPanel();
 		action.setLayout(new GridLayout(4,1));// BoxLayout(action, BoxLayout.PAGE_AXIS));
 		action.setMaximumSize(new Dimension(80, 400));
-		action.add(buttonAction);
 		// Defines action associated to buttons
-		buttonAction.addActionListener(new ButtonListener());
 		action.add(buttonInversion);
 		buttonInversion.addActionListener(new Inversion());
 		action.add(buttonHisto);
@@ -195,13 +192,6 @@ class ImageViewer extends JFrame /*implements ActionListener*/
 	/**
 	 * Class listening to a given button
 	 */
-	class ButtonListener implements ActionListener{
-		public void actionPerformed(ActionEvent arg0) 
-		{
-			System.out.println("Action Performed");
-		}
-	}
-	
 	class Inversion implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			ouputImage.inversion();
