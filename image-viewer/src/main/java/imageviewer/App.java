@@ -1,3 +1,5 @@
+package imageviewer;
+
 /**
  * Basic image processing application
  *
