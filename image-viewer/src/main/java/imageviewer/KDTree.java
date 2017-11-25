@@ -1,3 +1,5 @@
+package imageviewer;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -47,8 +49,8 @@ public class KDTree {
     //Construit une liste de noeuds a partir d'un tableau de pixels
     private List<Node> buildNodeList(int[][] pixels) {
         List<Node> nodes = new ArrayList<>();
-        for (int i = 0 ; i < pixels.length ; i++) {
-            nodes.add(new Node(pixels[i]));
+        for (int[] pixel : pixels) {
+            nodes.add(new Node(pixel));
         }
         return nodes;
     }
@@ -146,9 +148,7 @@ public class KDTree {
         } else if (filsD.tete != null) {
             moy = filsD.moyenne();
         } else {
-            for (int i = 0 ; i < dimension ; i++) {
-                moy[i] = this.tete.coord[i];
-            }
+            System.arraycopy(this.tete.coord, 0, moy, 0, dimension);
         }
         return moy;
     }
